@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  /* A nossa marca verde */
+  --color-river-green: #22C55E;
+  --color-river-dark: #166534;
+  --color-river-light: #DCFCE7;
+  
+  /* AS CORES LIGHT (Frescor e Clareza) */
+  --color-surface-bg: #F8FAFC;     /* Fundo geral off-white (cinza gelo bem claro) */
+  --color-surface-card: #FFFFFF;   /* Fundo dos cards branco puro */
+  --color-surface-text: #1E293B;   /* Texto Chumbo (Slate 800) para leitura confortável */
+  --color-surface-muted: #64748B;  /* Texto Secundário (Slate 500) */
+  
+  /* Cores do HealthScore */
+  --color-score-A: #15803D;
+  --color-score-B: #84CC16;
+  --color-score-C: #EAB308;
+  --color-score-D: #F97316;
+  --color-score-E: #EF4444;
+
+  --font-sans: "Inter", sans-serif;
+}
