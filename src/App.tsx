@@ -9,6 +9,7 @@ import { NewProduct } from './pages/admin/NewProduct';
 import { ProductList } from './pages/admin/ProductList';
 import { EditProduct } from './pages/admin/EditProduct';
 import { Profile } from './pages/admin/Profile';
+import { Search } from './pages/Search';
 
 // Componente bobo só para marcar lugar na tela do cliente
 function EmBreveCliente() {
@@ -26,16 +27,16 @@ export function App() {
 
         {/* LOGIN: Sem moldura */}
         <Route path="/restaurante/login" element={<Login />} />
-        
+
         {/* =========================================
             MUNDO B2B: RESTAURANTE (Totalmente desacoplado)
             ========================================= */}
         {/* ADMINISTRAÇÃO: Com Sidebar e Proteção de Rota [cite: 135] */}
         <Route path="/restaurante" element={<AdminLayout />}>
-        <Route path="produtos/editar/:id" element={<EditProduct />} />
+          <Route path="produtos/editar/:id" element={<EditProduct />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="produtos" element={<ProductList/>} />
-          <Route path="produtos/novo" element={<NewProduct/>} />
+          <Route path="produtos" element={<ProductList />} />
+          <Route path="produtos/novo" element={<NewProduct />} />
           <Route path="perfil" element={<Profile />} />
         </Route>
 
@@ -47,6 +48,7 @@ export function App() {
 
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<Home />} />
+          <Route path="search" element={<Search />} /> {/* Nova Rota */}
         </Route>
 
       </Routes>

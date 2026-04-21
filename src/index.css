@@ -21,3 +21,12 @@
 
   --font-sans: "Inter", sans-serif;
 }
+
+/* Esconde a barra de rolagem mas mantém a funcionalidade */
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}
+.overflow-x-auto {
+  -ms-overflow-style: none;  /* IE e Edge */
+  scrollbar-width: none;  /* Firefox */
+}

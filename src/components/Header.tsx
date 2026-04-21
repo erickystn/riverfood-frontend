@@ -1,15 +1,33 @@
 // src/components/Header.tsx
-import { useState } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { MagnifyingGlass, ShoppingCart, User, CaretDown, Storefront } from '@phosphor-icons/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';
 import { CartSidebar } from './CartSidebar';
 
 export function Header() {
-  // Estado para controlar a abertura da barra lateral do carrinho
+  // 1. Estados e Hooks da Busca
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('busca') || '');
+
+  // Sincroniza o input com a URL (caso o usuário volte a página ou dê F5)
+  useEffect(() => {
+    setSearchTerm(searchParams.get('busca') || '');
+  }, [searchParams]);
+
+  // Função que dispara quando o usuário aperta Enter ou clica na lupa
+  function handleSearch(e: FormEvent) {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/search?busca=${encodeURIComponent(searchTerm.trim())}`);
+    } else {
+      navigate(`/search`); // Se buscar vazio, manda pra página mostrando tudo
+    }
+  }
+
+  // 2. Estados e Hooks do Carrinho
   const [isCartOpen, setIsCartOpen] = useState(false);
-  
-  // Puxando os dados globais do Zustand
   const items = useCartStore((state) => state.items);
   const totalItems = items.reduce((total, item) => total + item.quantidade, 0);
 
@@ -25,17 +43,22 @@ export function Header() {
             </span>
           </Link>
 
-          {/* 2. Barra de Busca (Desktop) */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
+          {/* 2. Barra de Busca (Desktop) - AGORA É UM FORMULÁRIO */}
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg mx-8 relative">
             <input
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Busque por pratos saudáveis, categorias ou tags..."
               className="w-full bg-surface-bg border border-slate-200 rounded-full py-2 pl-5 pr-10 focus:outline-none focus:ring-2 focus:ring-river-green focus:border-transparent transition-all text-sm text-surface-text"
             />
-            <button className="absolute right-3 top-2 text-surface-muted hover:text-river-green transition-colors">
+            <button 
+              type="submit" 
+              className="absolute right-3 top-2 text-surface-muted hover:text-river-green transition-colors"
+            >
               <MagnifyingGlass size={20} weight="bold" />
             </button>
-          </div>
+          </form>
 
           {/* 3. Ações do Usuário e Carrinho */}
           <div className="flex items-center gap-4 md:gap-6">

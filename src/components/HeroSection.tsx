@@ -1,55 +1,43 @@
-import { MagnifyingGlassIcon, LeafIcon, FireIcon, TrophyIcon } from '@phosphor-icons/react';
+import { Leaf } from '@phosphor-icons/react';
 
 export function HeroSection() {
   return (
-    <section className="relative w-full py-16 md:py-24 rounded-3xl overflow-hidden mt-6 bg-surface-card border border-slate-100 shadow-xl shadow-slate-200/50">
+    // 1. GORDURA EXTERNA: Adicionei max-w-7xl e mx-auto para ele não esticar infinitamente em monitores grandes,
+    // e w-[calc(100%-2rem)] para forçar uma margem de segurança no mobile.
+    <section className="relative min-h-[450px] w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] max-w-7xl mx-auto rounded-[2.5rem] mt-8 overflow-hidden shadow-2xl flex items-center">
       
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 max-w-3xl mx-auto">
+      {/* Imagem de Fundo */}
+      <img 
+        src="https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=1200&auto=format&fit=crop" 
+        className="absolute inset-0 w-full h-full object-cover"
+        alt="Ingredientes saudáveis frescos"
+      />
+      
+      {/* Overlay Escuro */}
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-transparent"></div>
+
+      {/* 2. GORDURA INTERNA (A SOLUÇÃO): 
+          Troquei o 'px-8' por um padding super generoso na esquerda: 
+          pl-10 no mobile e pl-20 (ou até pl-24) no desktop. */}
+      <div className="relative z-10 pl-10 pr-6 py-12 md:pl-24 md:pr-12 md:py-16 max-w-3xl">
         
-        {/* Badge superior */}
-        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-river-light text-river-dark text-sm font-bold mb-6 border border-river-green/20">
-          <LeafIcon size={16} weight="bold" />
-          Delivery inteligente com foco em saúde
-        </span>
-
-        {/* Headline de impacto (Ajustado para ter contraste no branco) */}
-        <h1 className="text-4xl md:text-6xl font-black text-surface-text tracking-tight mb-6 leading-tight">
-          Sua liberdade para escolher, <br />
-          <span className="text-transparent bg-clip-text bg-linear-to-r from-river-dark to-river-green">
-            com informação de verdade.
-          </span>
+        {/* Badge */}
+        <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-black px-4 py-2 rounded-full w-fit uppercase tracking-widest mb-6 backdrop-blur-sm">
+          <Leaf size={16} weight="bold" />
+          Saúde em primeiro lugar
+        </div>
+        
+        {/* Título */}
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] mb-6 tracking-tight">
+          Alimente seu corpo com <br />
+          <span className="text-emerald-400 drop-shadow-md">inteligência nutricional.</span>
         </h1>
-
-        <p className="text-surface-muted text-lg md:text-xl mb-10 max-w-2xl">
-          Revolucionamos o delivery trazendo transparência nutricional imediata para cada prato do cardápio com o nosso sistema NutriScore.
+        
+        {/* Subtítulo */}
+        <p className="text-slate-300 text-base md:text-lg max-w-md font-medium leading-relaxed">
+          Nós unimos tecnologia e gastronomia. Escolha pratos pelo HealthScore e transforme sua rotina sem abrir mão do sabor.
         </p>
-
-        {/* Barra de Busca Gigante */}
-        <div className="w-full relative flex items-center mb-8 shadow-sm group">
-          <input 
-            type="text" 
-            placeholder="O que vamos comer de forma inteligente hoje?" 
-            className="w-full h-16 bg-surface-bg border-2 border-slate-200 rounded-2xl pl-14 pr-32 text-surface-text placeholder:text-surface-muted focus:outline-none focus:border-river-green focus:bg-surface-card transition-all text-lg"
-          />
-          <MagnifyingGlassIcon size={28} className="absolute left-5 text-surface-muted group-focus-within:text-river-green transition-colors" />
-          <button className="absolute right-2 h-12 px-6 bg-river-green hover:bg-river-dark text-white font-bold rounded-xl transition-colors shadow-md shadow-river-green/30">
-            Buscar
-          </button>
-        </div>
-
-        {/* Filtros Rápidos (Pills) */}
-        <div className="flex flex-wrap justify-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-bg border border-slate-200 hover:border-score-A hover:text-score-A hover:bg-surface-card text-surface-text transition-all text-sm font-medium shadow-sm">
-            <TrophyIcon size={16} /> Top HealthScore
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-bg border border-slate-200 hover:border-score-E hover:text-score-E hover:bg-surface-card text-surface-text transition-all text-sm font-medium shadow-sm">
-            <FireIcon size={16} /> Promoções do Dia
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-surface-bg border border-slate-200 hover:border-river-green hover:text-river-green hover:bg-surface-card text-surface-text transition-all text-sm font-medium shadow-sm">
-            <LeafIcon size={16} /> Opções Veganas
-          </button>
-        </div>
-
+        
       </div>
     </section>
   );

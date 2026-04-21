@@ -4,14 +4,19 @@ import {
   SquaresFour,
   Package,
   PlusCircle,
-  UserCircle,
   SignOut,
   ArrowLeft,
   Leaf
 } from '@phosphor-icons/react';
 import { useAuthStore } from '../store/useAuthStore';
 
-export function Sidebar() {
+// 1. Tipagem das props que vêm lá do AdminLayout
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { pathname } = useLocation();
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
@@ -25,11 +30,21 @@ export function Sidebar() {
   `;
 
   return (
-    <aside className="w-64 bg-surface-card border-r border-slate-200 flex flex-col h-screen sticky top-0">
+    // 2. Classes atualizadas para o comportamento responsivo (Off-Canvas)
+    <aside className={`
+      fixed inset-y-0 left-0 z-50 w-64 bg-surface-card border-r border-slate-200 flex flex-col h-screen
+      transform transition-transform duration-300 ease-in-out
+      lg:relative lg:translate-x-0 
+      ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
+    `}>
 
       {/* Topo: Branding e Voltar */}
       <div className="p-6">
-        <Link to="/" className="flex items-center gap-2 text-river-dark hover:text-river-green transition-colors mb-8 group">
+        <Link 
+          to="/" 
+          onClick={onClose} // Fecha menu ao voltar pro app
+          className="flex items-center gap-2 text-river-dark hover:text-river-green transition-colors mb-8 group"
+        >
           <ArrowLeft size={18} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
           <span className="text-xs font-bold uppercase tracking-wider">Voltar ao App</span>
         </Link>
@@ -49,29 +64,41 @@ export function Sidebar() {
 
       {/* Menu de Navegação */}
       <nav className="flex-1 px-4 flex flex-col gap-2">
-        <Link to="/restaurante/dashboard" className={linkClass('/restaurante/dashboard')}>
+        <Link 
+          to="/restaurante/dashboard" 
+          onClick={onClose} 
+          className={linkClass('/restaurante/dashboard')}
+        >
           <SquaresFour size={20} weight="bold" />
           Dashboard
         </Link>
 
-        <Link to="/restaurante/produtos" className={linkClass('/restaurante/produtos')}>
+        <Link 
+          to="/restaurante/produtos" 
+          onClick={onClose} 
+          className={linkClass('/restaurante/produtos')}
+        >
           <Package size={20} weight="bold" />
           Meus Produtos
         </Link>
 
-        <Link to="/restaurante/produtos/novo" className={linkClass('/restaurante/produtos/novo')}>
+        <Link 
+          to="/restaurante/produtos/novo" 
+          onClick={onClose} 
+          className={linkClass('/restaurante/produtos/novo')}
+        >
           <PlusCircle size={20} weight="bold" />
           Novo Prato
         </Link>
       </nav>
 
       {/* Rodapé da Sidebar: Usuário e Sair */}
-
       <div className="p-4 border-t border-slate-100">
-
-        <Link to="/restaurante/perfil">
-          <div className="flex items-center gap-3 px-2 mb-4">
-            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-river-dark font-bold border-2 border-river-light">
+        
+        {/* Link para o Perfil (também fecha o menu no mobile) */}
+        <Link to="/restaurante/perfil" onClick={onClose}>
+          <div className="flex items-center gap-3 px-2 mb-4 hover:bg-slate-50 p-2 rounded-xl transition-colors cursor-pointer">
+            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-river-dark font-bold border-2 border-river-light shrink-0">
               {user?.nome?.charAt(0) || 'R'}
             </div>
             <div className="flex-1 overflow-hidden">
@@ -81,15 +108,18 @@ export function Sidebar() {
           </div>
         </Link>
 
-
         <button
-          onClick={logout}
+          onClick={() => {
+            onClose(); // Fecha o menu (se for mobile)
+            logout();  // Executa o logout
+          }}
           className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-score-E hover:bg-score-E/10 rounded-xl transition-colors"
         >
           <SignOut size={20} weight="bold" />
           Sair da Conta
         </button>
       </div>
+      
     </aside>
   );
 }

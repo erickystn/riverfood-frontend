@@ -1,6 +1,6 @@
 // src/pages/Login.tsx
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Leaf, 
@@ -24,6 +24,12 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [nomeRestaurante, setNomeRestaurante] = useState(''); // Usado apenas no cadastro
   const [isLoading, setIsLoading] = useState(false);
+  const isLogged = useAuthStore((state) => state.isLogged);
+
+  // SE JÁ ESTIVER LOGADO: Redireciona para o dashboard antes mesmo de renderizar o formulário
+  if (isLogged) {
+    return <Navigate to="/restaurante/dashboard" replace />;
+  }
 
   // Função para lidar com a Autenticação Real
   async function handleAuthenticate(e: React.FormEvent) {
