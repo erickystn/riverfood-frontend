@@ -5,6 +5,7 @@ import { api } from '../services/api';
 import { Leaf, Sparkle } from '@phosphor-icons/react';
 import { Link } from 'react-router-dom';
 import { Search } from './Search';
+import { HealthScoreSection } from '../components/HealthScoreSection';
 
 export function Home() {
   const [topProducts, setTopProducts] = useState<any[]>([]);
@@ -63,6 +64,7 @@ export function Home() {
           </div>
         )}
       </section>
+      <HealthScoreSection/>
     </div>
   );
 }
