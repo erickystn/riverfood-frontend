@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# 🌊 River Food - Nutrição Inteligente & Delivery
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+O **River Food** é uma plataforma de delivery full-stack que redefine a experiência de escolha alimentar. Através de um **Motor de HealthScore** exclusivo, o projeto analisa técnicas de preparo e ingredientes para guiar o usuário em direção a uma alimentação mais consciente, sem perder a praticidade do delivery moderno.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Diferenciais Técnicos
 
-## React Compiler
+### 🟢 Motor de HealthScore (Raio-X Nutricional)
+Diferente de apps convencionais, o River Food utiliza um algoritmo que processa atributos de saúde (como `In Natura`, `Rico em Proteínas` ou `Ultraprocessado`) para atribuir uma nota visual (A, B ou C). O modal de detalhes realiza o mapeamento dinâmico dessas informações diretamente da API.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🖱️ UX Avançada: Drag-to-Scroll & Wheel
+Desenvolvemos uma barra de categorias personalizada que adapta a experiência mobile para o desktop. 
+- **Scroll Horizontal:** Conversão de movimento vertical do mouse em deslocamento lateral.
+- **Interatividade:** Sistema de clique e arrasto (*drag-to-scroll*) para navegação fluida em qualquer dispositivo.
 
-## Expanding the ESLint configuration
+### 📦 Arquitetura & Estado
+- **Zustand + Persistence:** Carrinho de compras robusto que sobrevive ao fechamento do navegador.
+- **Framer Motion:** Micro-interações e transições de modais com alta performance.
+- **NestJS + TypeORM:** Backend estruturado para escalabilidade e integridade de dados.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Tecnologias Utilizadas
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Frontend:** React, TypeScript, Tailwind CSS, Zustand, Framer Motion, Phosphor Icons.
+- **Backend:** NestJS, TypeORM, PostgreSQL.
+- **Ferramentas:** Vite, ImageKit (fallback de imagens), Axios.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📂 Como Rodar o Projeto
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. **Clone o repositório:**
+   ```bash
+   git clone [https://github.com/seu-usuario/river-food.git](https://github.com/seu-usuario/river-food.git)
+   ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2. **Instale as dependências:**
+   ```bash
+   npm install
+   ```
+
+3. **Configuração da API:**
+   Certifique-se de que o backend está rodando e aponte a URL no seu `.env`:
+   ```env
+   VITE_API_URL=http://localhost:8080
+   ```
+
+4. **Execução:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 🎨 Protótipo e Design
+O projeto utiliza uma estética **Neon-Dark** e **Outlined**, focada em contraste e legibilidade, garantindo que as informações de saúde (badges coloridas) sejam o ponto central de atenção do usuário.
+
+---
+
+## 👨‍💻 Desenvolvedor
+Desenvolvido por **Erick Braga**.  
+Focado em transformar linhas de código em soluções de impacto para o bem-estar.
+
+[LinkedIn](https://www.linkedin.com/in/erick-braga-santana/) | [GitHub](https://github.com/ErickBragaLopes)
