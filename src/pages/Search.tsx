@@ -199,12 +199,7 @@ export function Search() {
           {produtosFiltrados.map((p) => (
             <ProductCard 
               key={p.id}
-              id={p.id}
-              nome={p.nome}
-              descricao={p.descricao}
-              preco={p.preco}
-              healthScore={p.healthScore >= 80 ? 'A' : p.healthScore >= 60 ? 'B' : 'C'}
-              imgUrl={p.imgUrl}
+              {...p} // <--- Isso aqui passa ID, nome, tagsPreparo, usuario, TUDO de uma vez!
             />
           ))}
         </div>

@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { MagnifyingGlass, ShoppingCart, User, CaretDown, Storefront } from '@phosphor-icons/react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCartStore } from '../store/useCartStore';

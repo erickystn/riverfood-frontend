@@ -57,13 +57,7 @@ export function Home() {
             {topProducts.map((p) => (
               <ProductCard
                 key={p.id}
-                id={p.id}
-                nome={p.nome}
-                descricao={p.descricao}
-                preco={p.preco}
-                // Convertendo score numérico para a letra do componente
-                healthScore={p.healthScore >= 80 ? 'A' : p.healthScore >= 60 ? 'B' : 'C'}
-                imgUrl={p.imgUrl}
+                {...p} // <--- O SEGREDO É ESSE: Passa o objeto completo para o Modal funcionar
               />
             ))}
           </div>
