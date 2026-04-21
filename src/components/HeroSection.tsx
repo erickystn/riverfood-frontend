@@ -15,7 +15,7 @@ export function HeroSection() {
         {/* Headline de impacto (Ajustado para ter contraste no branco) */}
         <h1 className="text-4xl md:text-6xl font-black text-surface-text tracking-tight mb-6 leading-tight">
           Sua liberdade para escolher, <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-river-dark to-river-green">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-river-dark to-river-green">
             com informação de verdade.
           </span>
         </h1>
