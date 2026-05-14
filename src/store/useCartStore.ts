@@ -3,54 +3,85 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { type ProductProps } from '../components/ProductCard';
 
-// 1. Tipamos o que é um item dentro do carrinho (Produto + Quantidade)
 export interface CartItem extends ProductProps {
   quantidade: number;
 }
 
-// 2. Tipamos as ações que a nossa "loja" pode fazer
 interface CartStore {
   items: CartItem[];
-  addItem: (product: ProductProps) => void;
+  // Novos estados para travar o carrinho
+  restauranteId: number | null;
+  restauranteNome: string | null;
+  
+  // Modificamos o addItem para retornar um booleano
+  // true = adicionou com sucesso / false = tentou adicionar de outro restaurante
+  addItem: (product: ProductProps) => boolean;
   removeItem: (productId: number) => void;
   clearCart: () => void;
+  // Nova função para quando o usuário aceitar trocar de restaurante
+  forceAddItemAndClear: (product: ProductProps) => void; 
 }
 
-// 3. Criamos o Hook global com a mágica do Zustand + Persistência
 export const useCartStore = create<CartStore>()(
   persist(
-    (set) => ({
-      items: [], // O carrinho começa vazio
+    (set, get) => ({
+      items: [],
+      restauranteId: null,
+      restauranteNome: null,
 
-      addItem: (product) => 
-        set((state) => {
-          // Verifica se o prato já está no carrinho
-          const itemExists = state.items.find((item) => item.id === product.id);
+      addItem: (product) => {
+        const state = get();
+        const produtoRestauranteId = product.usuario?.id;
+        const produtoRestauranteNome = product.usuario?.nome;
 
-          if (itemExists) {
-            // Se já existe, apenas aumenta a quantidade
-            return {
-              items: state.items.map((item) =>
-                item.id === product.id
-                  ? { ...item, quantidade: item.quantidade + 1 }
-                  : item
-              ),
-            };
-          }
+        // REGRA DE NEGÓCIO: Se o carrinho tem itens e o restaurante é diferente, BLOQUEIA!
+        if (state.restauranteId !== null && state.restauranteId !== produtoRestauranteId) {
+          return false; // Retorna falso para a UI abrir o modal de confirmação
+        }
 
-          // Se é a primeira vez, adiciona o prato com quantidade 1
-          return { items: [...state.items, { ...product, quantidade: 1 }] };
-        }),
+        // Se passou da trava, adiciona normalmente
+        const itemExists = state.items.find((item) => item.id === product.id);
+
+        if (itemExists) {
+          set({
+            items: state.items.map((item) =>
+              item.id === product.id ? { ...item, quantidade: item.quantidade + 1 } : item
+            ),
+          });
+        } else {
+          set({ 
+            items: [...state.items, { ...product, quantidade: 1 }],
+            restauranteId: produtoRestauranteId,
+            restauranteNome: produtoRestauranteNome
+          });
+        }
+        
+        return true; // Sucesso
+      },
+
+      forceAddItemAndClear: (product) => {
+        // Esvazia tudo e começa um carrinho novo com o novo restaurante
+        set({
+          items: [{ ...product, quantidade: 1 }],
+          restauranteId: product.usuario?.id,
+          restauranteNome: product.usuario?.nome
+        });
+      },
 
       removeItem: (productId) =>
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== productId),
-        })),
+        set((state) => {
+          const newItems = state.items.filter((item) => item.id !== productId);
+          // Se o carrinho ficou vazio após remover o item, liberamos o restauranteId
+          if (newItems.length === 0) {
+            return { items: [], restauranteId: null, restauranteNome: null };
+          }
+          return { items: newItems };
+        }),
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], restauranteId: null, restauranteNome: null }),
     }),
     {
-      name: 'riverfood-cart-storage', // Nome do "arquivo" salvo no navegador
+      name: 'riverfood-cart-storage',
     }
   )
 );

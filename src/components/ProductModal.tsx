@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingCart, Leaf, CheckCircle, Storefront } from '@phosphor-icons/react';
 import { TagHealthScore } from './TagHealthScore';
-import { api } from '../services/api'; // Importando sua instância do axios
+import { api } from '../services/api';
+import foodPlaceholder from '../assets/riverfood-logo.png';
 
 interface ProductModalProps {
     isOpen: boolean;
@@ -45,6 +46,9 @@ export function ProductModal({ isOpen, onClose, product, onAddToCart }: ProductM
         if (score >= 60) return 'B';
         return 'C';
     };
+    const imageSource = product.imgUrl && product.imgUrl.trim() !== ""
+        ? product.imgUrl
+        : foodPlaceholder;
 
     return (
         <AnimatePresence>
@@ -71,9 +75,10 @@ export function ProductModal({ isOpen, onClose, product, onAddToCart }: ProductM
                             {/* Lado Esquerdo: Imagem */}
                             <div className="w-full md:w-1/2 h-72 md:h-auto relative">
                                 <img
-                                    src={product.imgUrl || 'https://ik.imagekit.io/nuqrdttx8/image.png'}
+                                    src={imageSource} // <--- Variável tratada
                                     className="w-full h-full object-cover"
                                     alt={product.nome}
+                                    onError={(e) => { (e.target as HTMLImageElement).src = foodPlaceholder; }}
                                 />
                                 <button
                                     onClick={onClose}

@@ -1,6 +1,7 @@
 // src/services/api.ts
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
+import { toast } from 'react-toastify';
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -25,9 +26,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !isLoginRoute) {
       const logout = useAuthStore.getState().logout;
       logout(); 
-      
-      if (!window.location.pathname.includes('/restaurante/login')) {
-        window.location.href = '/restaurante/login';
+      toast.info("Sessão Expirada. Entre novamente!")
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
       }
     }
     

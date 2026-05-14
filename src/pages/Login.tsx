@@ -1,70 +1,90 @@
 // src/pages/Login.tsx
-import { useState } from 'react';
-import { useNavigate, Link, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, Navigate, useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Leaf, 
   Storefront, 
   Envelope, 
   Lock, 
-  Storefront as StoreIcon 
+  Storefront as StoreIcon,
+  User as UserIcon,
+  Swap
 } from '@phosphor-icons/react';
 import { toast } from 'react-toastify';
 
 import { api } from '../services/api';
-import { useAuthStore } from '../store/useAuthStore';
+import { useAuthStore, type TipoUsuario } from '../store/useAuthStore';
 
 export function Login() {
   const navigate = useNavigate();
-  const setLogin = useAuthStore((state) => state.setLogin);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Extrai o tipo da URL (ex: /login?type=restaurante) ou define CLIENTE como padrão
+  const typeParam = searchParams.get('type');
+  const initialMode: TipoUsuario = typeParam === 'restaurante' ? 'RESTAURANTE' : 'CLIENTE';
 
-  // Estados locais para o formulário
+  const setLogin = useAuthStore((state) => state.setLogin);
+  const isLogged = useAuthStore((state) => state.isLogged);
+  const user = useAuthStore((state) => state.user);
+
+  // Estados locais
+  const [viewMode, setViewMode] = useState<TipoUsuario>(initialMode);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [nomeRestaurante, setNomeRestaurante] = useState(''); // Usado apenas no cadastro
+  const [nome, setNome] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const isLogged = useAuthStore((state) => state.isLogged);
 
-  // SE JÁ ESTIVER LOGADO: Redireciona para o dashboard antes mesmo de renderizar o formulário
-  if (isLogged) {
-    return <Navigate to="/restaurante/dashboard" replace />;
+  // Atualiza o estado interno se a URL mudar (ao clicar no menu principal)
+  useEffect(() => {
+    setViewMode(initialMode);
+  }, [initialMode]);
+
+  // Se já estiver logado, redireciona para o lugar certo
+  if (isLogged && user) {
+    return <Navigate to={user.tipo === 'RESTAURANTE' ? "/restaurante/dashboard" : "/"} replace />;
   }
 
-  // Função para lidar com a Autenticação Real
+  // Função para alternar a visão visualmente e na URL
+  const toggleViewMode = () => {
+    const newMode = viewMode === 'CLIENTE' ? 'RESTAURANTE' : 'CLIENTE';
+    setViewMode(newMode);
+    setSearchParams({ type: newMode.toLowerCase() });
+    setIsLogin(true); // Reseta para a tela de login ao trocar de modo
+  };
+
   async function handleAuthenticate(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       if (isLogin) {
-        // Fluxo de LOGIN
         const response = await api.post('/usuarios/logar', {
-          usuario: email, // O teu back espera 'usuario' como chave para o email
-          senha: password
-        });
-
-        const { id, nome, usuario, token } = response.data;
-
-        // Guarda no Zustand (isso dispara o persist para o LocalStorage)
-        setLogin({ id, nome, usuario }, token);
-
-        toast.success(`Bem-vindo, ${nome}!`);
-        navigate('/restaurante/dashboard');
-      } else {
-        // Fluxo de CADASTRO (Implementação futura baseada no teu POST /usuarios/cadastrar)
-        await api.post('/usuarios/cadastrar', {
-          nome: nomeRestaurante,
           usuario: email,
           senha: password
         });
 
-        setNomeRestaurante("");
+        const { id, nome, usuario, tipo, token } = response.data;
+
+        setLogin({ id, nome, usuario, tipo }, token);
+        toast.success(`Bem-vindo, ${nome}!`);
+
+        navigate(tipo === 'RESTAURANTE' ? '/restaurante/dashboard' : '/');
+      } else {
+        await api.post('/usuarios/cadastrar', {
+          nome: nome,
+          usuario: email,
+          senha: password,
+          tipo: viewMode // O cadastro agora respeita a aba que o usuário está vendo!
+        });
+
+        setNome("");
         setEmail("");
         setPassword("");
         
-        toast.success("Conta criada com sucesso! Faça login para aceder.");
-        setIsLogin(true); // Muda para o modo login
+        toast.success("Conta criada com sucesso! Faça o login.");
+        setIsLogin(true); 
       }
     } catch (error: any) {
       const message = error.response?.data?.message || "Erro na autenticação. Verifique os dados.";
@@ -74,67 +94,102 @@ export function Login() {
     }
   }
 
+  // ==========================================
+  // VARIÁVEIS VISUAIS DINÂMICAS (A Mágica da UX)
+  // ==========================================
+  const isCliente = viewMode === 'CLIENTE';
+  
+  const theme = {
+    bgBanner: isCliente 
+      ? "bg-[url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200')]" // Comida saudável
+      : "bg-[url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200')]", // Dashboard/Restaurante
+    title: isCliente ? "Peça comida saudável com consciência." : "A plataforma de gestão para o seu restaurante.",
+    icon: isCliente ? <Leaf size={24} weight="fill" /> : <Storefront size={24} weight="fill" />,
+    formTitle: isLogin 
+      ? (isCliente ? "Acessar sua Conta" : "Acesso ao Painel") 
+      : (isCliente ? "Criar Conta de Cliente" : "Registar Restaurante"),
+    formSubtitle: isLogin
+      ? (isCliente ? "Faça login para fazer seus pedidos." : "Entre com as suas credenciais de parceiro.")
+      : (isCliente ? "Junte-se à revolução saudável." : "Digitalize o seu cardápio de forma inteligente."),
+    switchPrompt: isCliente ? "É dono de um restaurante?" : "Quer apenas pedir comida?",
+    switchAction: isCliente ? "Acessar área de Parceiros" : "Entrar como Cliente",
+    namePlaceholder: isCliente ? "Seu Nome Completo" : "Nome do Restaurante",
+    InputIcon: isCliente ? UserIcon : StoreIcon
+  };
+
   return (
     <div className="min-h-screen flex bg-surface-bg font-sans">
       
-      {/* LADO ESQUERDO: Branding (Desktop) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-river-dark relative flex-col justify-between p-12 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200&auto=format&fit=crop')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
+      {/* LADO ESQUERDO: Branding Dinâmico */}
+      <div className={`hidden lg:flex lg:w-1/2 ${isCliente ? 'bg-river-green' : 'bg-river-dark'} relative flex-col justify-between p-12 overflow-hidden transition-colors duration-500`}>
+        <div className={`absolute inset-0 ${theme.bgBanner} opacity-20 bg-cover bg-center mix-blend-overlay transition-all duration-500`}></div>
         
         <div className="relative z-10">
-          <Link to="/" className="inline-flex items-center gap-2 text-white hover:text-river-light transition-colors mb-12">
+          <Link to="/" className="inline-flex items-center gap-2 text-white hover:opacity-80 transition-opacity mb-12">
             <ArrowLeft size={20} weight="bold" />
-            <span className="font-medium text-sm">Voltar para a Vitrine</span>
+            <span className="font-medium text-sm">Voltar para a Página Principal</span>
           </Link>
           
           <div className="flex items-center gap-1 text-4xl font-black text-white tracking-tight mb-6">
-            RIVER<span className="text-river-green">FOOD</span>
+            RIVER<span className={isCliente ? "text-river-dark" : "text-river-green"}>FOOD</span>
           </div>
           
           <h1 className="text-4xl font-bold text-white leading-tight max-w-md">
-            A plataforma de gestão para restaurantes que priorizam a saúde.
+            {theme.title}
           </h1>
         </div>
 
-        <div className="relative z-10 text-river-light/80 text-sm">
-          &copy; {new Date().getFullYear()} River Food. Dashboard Administrativo.
+        <div className="relative z-10 text-white/80 text-sm font-medium">
+          &copy; {new Date().getFullYear()} River Food. {isCliente ? 'Para Clientes.' : 'Para Parceiros.'}
         </div>
       </div>
 
-      {/* LADO DIREITO: Formulários */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12 relative">
+      {/* LADO DIREITO: Formulário */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12 relative overflow-y-auto">
         
-        {/* Link de volta (Mobile) */}
-        <Link to="/" className="lg:hidden absolute top-8 left-8 text-surface-muted hover:text-river-dark transition-colors">
+        {/* Link voltar mobile */}
+        <Link to="/" className="lg:hidden absolute top-8 left-8 text-surface-muted hover:text-river-dark transition-colors flex items-center gap-2">
           <ArrowLeft size={24} weight="bold" />
+          <span className="text-sm font-bold">Início</span>
         </Link>
 
-        <div className="w-full max-w-md bg-surface-card p-8 rounded-3xl shadow-xl border border-slate-100">
+        {/* Botão de Alternar Visão (No topo direito) */}
+        <button 
+          onClick={toggleViewMode}
+          className="absolute top-8 right-8 flex items-center gap-2 text-xs font-bold text-surface-muted hover:text-river-dark transition-colors border border-slate-200 px-4 py-2 rounded-full shadow-sm hover:shadow-md bg-white"
+        >
+          <Swap size={16} weight="bold" />
+          {theme.switchAction}
+        </button>
+
+        <div className="w-full max-w-md bg-surface-card p-8 rounded-3xl shadow-xl border border-slate-100 mt-12 lg:mt-0">
           
           <div className="text-center mb-8">
-            <div className="mx-auto w-12 h-12 bg-river-light text-river-dark rounded-full flex items-center justify-center mb-4">
-              {isLogin ? <Storefront size={24} weight="fill" /> : <Leaf size={24} weight="fill" />}
+            <div className={`mx-auto w-12 h-12 ${isCliente ? 'bg-river-green/20 text-river-green' : 'bg-river-light text-river-dark'} rounded-full flex items-center justify-center mb-4 transition-colors`}>
+              {theme.icon}
             </div>
             <h2 className="text-2xl font-bold text-surface-text">
-              {isLogin ? 'Aceder ao Painel' : 'Registar Restaurante'}
+              {theme.formTitle}
             </h2>
             <p className="text-surface-muted mt-2 text-sm">
-              {isLogin ? 'Entre com as suas credenciais de parceiro.' : 'Crie a sua conta e comece a gerir o seu cardápio.'}
+              {theme.formSubtitle}
             </p>
           </div>
 
           <form onSubmit={handleAuthenticate} className="flex flex-col gap-4">
             
             {!isLogin && (
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-surface-muted uppercase ml-1">Nome do Restaurante</label>
+              <div className="space-y-1 animate-fade-in">
+                <label className="text-xs font-bold text-surface-muted uppercase ml-1">
+                  {theme.namePlaceholder}
+                </label>
                 <div className="relative">
-                  <StoreIcon size={18} className="absolute left-4 top-3.5 text-slate-400" />
+                  <theme.InputIcon size={18} className="absolute left-4 top-3.5 text-slate-400" />
                   <input 
                     type="text" 
-                    value={nomeRestaurante}
-                    onChange={(e) => setNomeRestaurante(e.target.value)}
-                    placeholder="Ex: Saladas & Grãos" 
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    placeholder={isCliente ? "Ex: Erick Braga" : "Ex: Fit da Praça"} 
                     className="w-full bg-surface-bg border border-slate-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-river-green transition-all"
                     required={!isLogin}
                   />
@@ -143,14 +198,14 @@ export function Login() {
             )}
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-surface-muted uppercase ml-1">Email de Usuário</label>
+              <label className="text-xs font-bold text-surface-muted uppercase ml-1">Email</label>
               <div className="relative">
                 <Envelope size={18} className="absolute left-4 top-3.5 text-slate-400" />
                 <input 
                   type="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="contato@restaurante.com" 
+                  placeholder="exemplo@email.com" 
                   className="w-full bg-surface-bg border border-slate-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-river-green transition-all"
                   required
                 />
@@ -158,7 +213,20 @@ export function Login() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-bold text-surface-muted uppercase ml-1">Palavra-passe</label>
+              <div className="flex items-center justify-between ml-1">
+                <label className="text-xs font-bold text-surface-muted uppercase">Palavra-passe</label>
+                
+                {/* BOTÃO ESQUECEU A SENHA (Ainda sem rota) */}
+                {isLogin && (
+                  <button 
+                    type="button"
+                    onClick={() => toast.info("Funcionalidade de recuperação de palavra-passe em breve!")}
+                    className="text-xs font-bold text-river-green hover:text-river-dark transition-colors"
+                  >
+                    Esqueceu a senha?
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <Lock size={18} className="absolute left-4 top-3.5 text-slate-400" />
                 <input 
@@ -175,7 +243,7 @@ export function Login() {
             <button 
               type="submit"
               disabled={isLoading}
-              className="w-full bg-river-dark hover:bg-river-green text-white font-black py-4 rounded-xl transition-all mt-4 shadow-lg shadow-river-dark/10 flex items-center justify-center gap-2"
+              className={`w-full ${isCliente ? 'bg-river-green hover:bg-river-dark' : 'bg-river-dark hover:bg-river-green'} text-white font-black py-4 rounded-xl transition-colors mt-2 shadow-lg shadow-river-dark/10 flex items-center justify-center gap-2`}
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -185,14 +253,16 @@ export function Login() {
             </button>
           </form>
 
-          <div className="mt-8 text-center text-sm text-surface-muted">
-            {isLogin ? "Ainda não é parceiro? " : "Já tem acesso ao painel? "}
-            <button 
-              onClick={() => setIsLogin(!isLogin)} 
-              className="text-river-green font-bold hover:text-river-dark transition-colors"
-            >
-              {isLogin ? "Cadastre-se aqui" : "Faça o login"}
-            </button>
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center text-sm text-surface-muted">
+            <p className="mb-2">
+              {isLogin ? "Ainda não tem conta? " : "Já possui acesso? "}
+              <button 
+                onClick={() => setIsLogin(!isLogin)} 
+                className="text-river-green font-bold hover:text-river-dark transition-colors"
+              >
+                {isLogin ? "Registe-se aqui" : "Faça o login"}
+              </button>
+            </p>
           </div>
 
         </div>
