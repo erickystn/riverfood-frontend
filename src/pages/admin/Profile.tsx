@@ -57,9 +57,9 @@ async function handleUpdateProfile(e: React.FormEvent) {
     // 2. MONTAGEM DO PAYLOAD
     // Se isChangingPassword for true, envia a nova. Se false, envia "" (vazio).
     const payload = {
-      id: user?.id,
       nome: nome,
       usuario: email,
+      foto:'',
       senha: isChangingPassword ? novaSenha : "", 
     };
 
@@ -70,7 +70,8 @@ async function handleUpdateProfile(e: React.FormEvent) {
     setLogin({ 
       id: response.data.id, 
       nome: response.data.nome, 
-      usuario: response.data.usuario 
+      usuario: response.data.usuario ,
+      tipo:response.data.tipoUsuario
     }, token as string);
 
     toast.success("Perfil atualizado com sucesso!");

@@ -67,13 +67,14 @@ export function ProductCard(props: ProductProps) {
       >
         <div className="relative h-48 overflow-hidden bg-slate-50">
           <img 
-          src={imageSource} // <--- Usamos a variável tratada
-          alt={nome} 
-          onError={(e) => { (e.target as HTMLImageElement).src = foodPlaceholder }} // Safe-guard extra!
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-        />
+            src={imageSource} 
+            alt={nome} 
+            onError={(e) => { (e.target as HTMLImageElement).src = foodPlaceholder }} 
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+          />
           <div className="absolute top-4 right-4">
-            <TagHealthScore score={healthScore >= 80 ? 'A' : healthScore >= 60 ? 'B' : 'C'} />
+            {/* Apenas passe a nota numérica! */}
+            <TagHealthScore score={healthScore} />
           </div>
         </div>
 

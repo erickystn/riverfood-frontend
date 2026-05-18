@@ -1,36 +1,31 @@
 // src/components/TagHealthScore.tsx
 import { cn } from "../utils/cn";
-
-// Tipamos exatamente o que esperamos do backend NestJS
-export type HealthScoreType = 'A' | 'B' | 'C' | 'D' | 'E';
+import { getHealthScoreDetails } from "../utils/healthScore";
 
 interface TagHealthScoreProps {
-  score: HealthScoreType;
-  className?: string; // Permite passar margens extras quando formos usar no card
+  score: number; // Agora recebemos a nota numérica bruta do NestJS (0 a 100)
+  className?: string; 
+  showLabel?: boolean; // Opção de mostrar "A - Excelente" ou só "A"
 }
 
-export function TagHealthScore({ score, className }: TagHealthScoreProps) {
-  // Dicionário de estilos: Mapeia cada nota para suas cores específicas
-  const scoreStyles = {
-    A: "bg-score-A text-white border-score-A",
-    B: "bg-score-B text-white border-score-B",
-    C: "bg-score-C text-white border-score-C",
-    D: "bg-score-D text-white border-score-D",
-    E: "bg-score-E text-white border-score-E",
-  };
+export function TagHealthScore({ score, className, showLabel = false }: TagHealthScoreProps) {
+  // O Utilitário faz todo o trabalho sujo de decidir se é A, B, C, D ou E
+  const details = getHealthScoreDetails(score);
 
   return (
     <div
       className={cn(
-        // Classes base (tamanho, formato, fonte)
-        "flex items-center justify-center font-black rounded-md border-2",
-        "w-8 h-8 text-sm", // Tamanho padrão, pode ser ajustado
-        scoreStyles[score], // Cor dinâmica baseada na prop
-        className // Classes extras passadas pelo pai
+        "inline-flex items-center justify-center font-black rounded-lg border-2 shadow-sm transition-transform hover:scale-105 cursor-help",
+        showLabel ? "px-3 py-1 gap-2 text-xs" : "w-8 h-8 text-sm", // Expande se tiver label
+        details.color,       // A cor de fundo mapeada ('bg-emerald-500', etc)
+        details.textColor,   // A cor do texto
+        `border-${details.color.replace('bg-', '')}`, // Dica de Tailwind para borda igual ao fundo
+        className
       )}
-      title={`Classificação Nutricional: ${score}`}
+      title={`${details.label}: ${details.description}`}
     >
-      {score}
+      <span>{details.letter}</span>
+      {showLabel && <span className="uppercase tracking-widest">- {details.label}</span>}
     </div>
   );
 }

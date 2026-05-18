@@ -1,5 +1,6 @@
 // src/pages/MeusPedidos.tsx
 import { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 import { api } from "../services/api";
 import {
   Package,
@@ -30,6 +31,7 @@ export interface Pedido {
   enderecoEntrega: string;
   codigoEntrega: string;
   restaurante: {
+    id: number;
     nome: string;
   };
   itens: Array<{
@@ -167,7 +169,7 @@ export function MeusPedidos() {
                         <span className="text-[10px] font-black uppercase opacity-60">
                           Código
                         </span>
-                        <span className="text-lg font-black tracking-widest text-river-green">
+                        <span className="text-lg font-black tracking-widest text-shadow-amber-50">
                           {pedido.codigoEntrega || "----"}
                         </span>
                       </div>
@@ -177,9 +179,11 @@ export function MeusPedidos() {
                 {/* CORPO DO CARD: Detalhes */}
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="font-black text-slate-800 text-lg mb-4">
-                      {pedido.restaurante.nome}
-                    </h3>
+                    <Link to={`/restaurante/${pedido.restaurante.id}`} className="inline-block mb-4 group-hover:text-river-green transition-colors">
+             <h3 className="font-black text-slate-800 text-lg hover:underline">
+                 {pedido.restaurante.nome}
+             </h3>
+        </Link>
                     <ul className="space-y-2">
                       {pedido.itens.map((item) => (
                         <li

@@ -30,9 +30,9 @@ export function Dashboard() {
   // BUSCA REAL DOS DADOS
   useEffect(() => {
     async function loadData() {
-      if (!user?.id) return;
       try {
-        const response = await api.get(`/usuarios/${user.id}`);
+        // 💡 Ajustado para buscar do perfil autenticado (seguro)
+        const response = await api.get('/usuarios/perfil');
         setProdutos(response.data.produtos || []);
       } catch (error) {
         console.error("Erro ao carregar dados do dashboard", error);
@@ -40,10 +40,13 @@ export function Dashboard() {
         setLoading(false);
       }
     }
-    loadData();
-  }, [user?.id]);
+    
+    if (user) {
+      loadData();
+    }
+  }, [user]);
 
-  // CÁLCULOS DINÂMICOS (Só rodam quando 'produtos' muda)
+  // CÁLCULOS DINÂMICOS
   const stats = useMemo(() => {
     if (produtos.length === 0) return null;
 
@@ -51,7 +54,7 @@ export function Dashboard() {
     const somaPrecos = produtos.reduce((acc, p) => acc + Number(p.preco), 0);
     const mediaPreco = somaPrecos / totalPratos;
     
-    // Calcula quantos pratos têm nota boa (ex: HealthScore >= 60 é A ou B)
+    // Pratos com nota >= 60 são considerados saudáveis (A e B no nosso sistema)
     const saudaveis = produtos.filter(p => p.healthScore >= 60).length;
     
     // Descobre o melhor prato
@@ -59,13 +62,13 @@ export function Dashboard() {
       (prev.healthScore > current.healthScore) ? prev : current
     );
 
-    // Conta pratos críticos (Nota C ou pior)
+    // Conta pratos críticos (Nota C ou pior, ou seja, < 60)
     const criticos = produtos.filter(p => p.healthScore < 60).length;
 
     return { totalPratos, mediaPreco, saudaveis, melhorPrato, criticos };
   }, [produtos]);
 
-  if (loading) return <div className="p-10 text-center animate-pulse">Carregando métricas...</div>;
+  if (loading) return <div className="p-10 text-center animate-pulse text-surface-muted font-bold">Carregando métricas da cozinha...</div>;
 
   return (
     <div className="space-y-10 animate-fade-in">
@@ -78,7 +81,7 @@ export function Dashboard() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard title="Total de Itens" value={stats.totalPratos} icon={Package} colorClass="bg-blue-100 text-blue-600" />
-            <StatCard title="Preço Médio" value={`R$ ${stats.mediaPreco.toFixed(2)}`} icon={CurrencyDollar} colorClass="bg-river-light text-river-dark" />
+            <StatCard title="Preço Médio" value={`R$ ${stats.mediaPreco.toFixed(2).replace('.', ',')}`} icon={CurrencyDollar} colorClass="bg-river-light text-river-dark" />
             <StatCard title="Pratos Saudáveis" value={stats.saudaveis} icon={CheckCircle} colorClass="bg-emerald-100 text-emerald-600" />
             <StatCard title="Pratos Críticos" value={stats.criticos} icon={Warning} colorClass="bg-amber-100 text-amber-600" />
           </div>
@@ -93,8 +96,11 @@ export function Dashboard() {
                 <h2 className="text-3xl font-black mt-4 mb-2">{stats.melhorPrato.nome}</h2>
                 <div className="mt-8 flex items-center gap-4">
                   <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
-                    <p className="text-xs font-bold text-river-light mb-1">Score Calculado</p>
-                    <TagHealthScore score={stats.melhorPrato.healthScore >= 80 ? 'A' : 'B'} />
+                    <p className="text-xs font-bold text-river-light mb-3">Score Calculado</p>
+                    
+                    {/* 💡 Ajuste de Ouro: Agora a Tag se resolve sozinha com o score do banco */}
+                    <TagHealthScore score={stats.melhorPrato.healthScore} showLabel={true} />
+                  
                   </div>
                 </div>
               </div>
@@ -108,13 +114,13 @@ export function Dashboard() {
                   <Warning size={28} weight="fill" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Atenção ao Cardápio</h3>
-                <p className="text-sm text-surface-muted">Você tem <strong>{stats.criticos} pratos</strong> com score baixo. Melhore os ingredientes!</p>
+                <p className="text-sm text-surface-muted">Você tem <strong>{stats.criticos} prato(s)</strong> com score baixo. Substitua ingredientes para melhorar a avaliação!</p>
               </div>
             )}
           </div>
         </>
       ) : (
-        <div className="p-10 bg-surface-card rounded-3xl text-center text-surface-muted">
+        <div className="p-10 bg-surface-card rounded-3xl text-center text-surface-muted border border-slate-100">
           Cadastre seu primeiro prato para ver as estatísticas.
         </div>
       )}

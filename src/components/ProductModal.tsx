@@ -5,6 +5,7 @@ import { X, ShoppingCart, Leaf, CheckCircle, Storefront } from '@phosphor-icons/
 import { TagHealthScore } from './TagHealthScore';
 import { api } from '../services/api';
 import foodPlaceholder from '../assets/riverfood-logo.png';
+import { Link } from 'react-router-dom';
 
 interface ProductModalProps {
     isOpen: boolean;
@@ -41,11 +42,6 @@ export function ProductModal({ isOpen, onClose, product, onAddToCart }: ProductM
     // Função para transformar "IN_NATURA" em "in-natura" para bater com o ID do back
     const normalizeTag = (tag: string) => tag.toLowerCase().replace(/_/g, '-');
 
-    const getLetterScore = (score: number) => {
-        if (score >= 80) return 'A';
-        if (score >= 60) return 'B';
-        return 'C';
-    };
     const imageSource = product.imgUrl && product.imgUrl.trim() !== ""
         ? product.imgUrl
         : foodPlaceholder;
@@ -91,7 +87,7 @@ export function ProductModal({ isOpen, onClose, product, onAddToCart }: ProductM
                             {/* Lado Direito: Informações */}
                             <div className="p-8 md:w-1/2 flex flex-col bg-white">
                                 <div className="flex justify-between items-start mb-6">
-                                    <TagHealthScore score={getLetterScore(product.healthScore)} />
+                                    <TagHealthScore score={product.healthScore} showLabel={true} />
                                     <div className="text-right">
                                         <p className="text-[10px] font-bold text-surface-muted uppercase tracking-widest">Valor do Prato</p>
                                         <span className="text-2xl font-black text-river-dark">
@@ -101,12 +97,14 @@ export function ProductModal({ isOpen, onClose, product, onAddToCart }: ProductM
                                 </div>
 
                                 {/* NOME DO RESTAURANTE - Direto do objeto 'usuario' do seu JSON */}
-                                <div className="flex items-center gap-2 text-river-green mb-2">
+                                <Link to={`/restaurante/${product.usuario?.id}`}
+                                    onClick={onClose} // Fecha o modal quando o usuário clica para navegar
+                                    className="flex items-center gap-2 text-river-green mb-2 hover:underline w-fit transition-all">
                                     <Storefront size={18} weight="bold" />
-                                    <span className="text-xs font-black uppercase tracking-widest">
+                                    <span className="py-1 font-black uppercase tracking-widest">
                                         {product.usuario?.nome || 'Restaurante Parceiro'}
                                     </span>
-                                </div>
+                                </Link>
 
                                 <h2 className="text-3xl font-black text-river-dark mb-3 leading-tight uppercase">
                                     {product.nome}

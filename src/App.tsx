@@ -1,25 +1,27 @@
 // src/App.tsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { DefaultLayout } from './components/DefaultLayout';
-import { Home } from './pages/Home';
-import { Login } from './pages/Login'; // O nosso super login unificado
-import { AdminLayout } from './components/AdminLayout';
-import { Dashboard } from './pages/admin/Dashboard';
-import { NewProduct } from './pages/admin/NewProduct';
-import { ProductList } from './pages/admin/ProductList';
-import { EditProduct } from './pages/admin/EditProduct';
-import { Profile } from './pages/admin/Profile';
-import { Search } from './pages/Search';
-import { NotFound } from './pages/NotFound';
-import { Checkout } from './pages/Checkout';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import { MeusPedidos } from './pages/MeusPedidos';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { DefaultLayout } from "./components/DefaultLayout";
+import { Home } from "./pages/Home";
+import { Login } from "./pages/Login"; // O nosso super login unificado
+import { AdminLayout } from "./components/AdminLayout";
+import { Dashboard } from "./pages/admin/Dashboard";
+import { NewProduct } from "./pages/admin/NewProduct";
+import { ProductList } from "./pages/admin/ProductList";
+import { EditProduct } from "./pages/admin/EditProduct";
+import { Profile as ProfileRestaurante } from "./pages/admin/Profile";
+import { Search } from "./pages/Search";
+import { NotFound } from "./pages/NotFound";
+import { Checkout } from "./pages/Checkout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { MeusPedidos } from "./pages/MeusPedidos";
+import { RestaurantePage } from "./pages/RestaurantePage";
+import { Profile } from "./pages/Profile";
+import { Orders } from "./pages/admin/Orders";
 
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         {/* ROTA UNIFICADA DE LOGIN */}
         <Route path="/login" element={<Login />} />
 
@@ -31,7 +33,8 @@ export function App() {
           <Route path="produtos" element={<ProductList />} />
           <Route path="produtos/novo" element={<NewProduct />} />
           <Route path="produtos/editar/:id" element={<EditProduct />} />
-          <Route path="perfil" element={<Profile />} />
+          <Route path="perfil" element={<ProfileRestaurante />} />
+          <Route path="pedidos" element={<Orders />} />
         </Route>
 
         {/* =========================================
@@ -40,8 +43,10 @@ export function App() {
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<Home />} />
           <Route path="search" element={<Search />} />
+          <Route path="/restaurante/:id" element={<RestaurantePage />} />
           {/* ÁREA PRIVADA DO CLIENTE */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/perfil" element={<Profile />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/meus-pedidos" element={<MeusPedidos />} />
             {/* <Route path="/perfil" element={<Perfil />} />  */}
@@ -50,7 +55,6 @@ export function App() {
 
         {/* ROTA CORINGA: Deve ser sempre a ÚLTIMA */}
         <Route path="*" element={<NotFound />} />
-
       </Routes>
     </BrowserRouter>
   );

@@ -1,9 +1,11 @@
+// src/components/HealthScoreSection.tsx
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Heartbeat, Leaf, ThermometerHot, ShieldCheck, 
-  Plus, Minus, ArrowsCounterClockwise, CheckCircle 
+  Plus, Minus, ArrowsCounterClockwise 
 } from '@phosphor-icons/react';
+import { getHealthScoreDetails } from '../utils/healthScore';
 
 export function HealthScoreSection() {
   // --- Lógica do Simulador ---
@@ -19,16 +21,19 @@ export function HealthScoreSection() {
   ];
 
   const scoreResult = useMemo(() => {
-    let score = 70;
+    let score = 70; // Base de cálculo inicial
+    
     activeTags.forEach(tagId => {
       const config = tagsConfig.find(t => t.id === tagId);
       if (config) score += config.points;
     });
+    
+    // Trava a nota final para nunca passar de 100 nem ficar negativa
     const finalScore = Math.min(Math.max(score, 0), 100);
     
-    if (finalScore >= 80) return { letter: 'A', color: 'bg-river-green', text: 'Saúde Máxima', shadow: 'shadow-river-green/30' };
-    if (finalScore >= 50) return { letter: 'B', color: 'bg-orange-400', text: 'Equilibrado', shadow: 'shadow-orange-400/30' };
-    return { letter: 'C', color: 'bg-rose-500', text: 'Evitar', shadow: 'shadow-rose-500/40' };
+    // 🔮 A MÁGICA: O Utilitário resolve a letra, cor e os textos!
+    return getHealthScoreDetails(finalScore);
+    
   }, [activeTags]);
 
   const toggleTag = (id: string) => {
@@ -43,7 +48,7 @@ export function HealthScoreSection() {
         <div className="text-center mb-16 space-y-4">
           <span className="text-river-green font-black text-xs uppercase tracking-[0.3em]">Tecnologia Nutricional</span>
           <h2 className="text-4xl md:text-5xl font-black text-slate-800">
-            Como funciona o <span className="text-river-green">HealthScore?</span>
+            Como funciona o <span className="text-river-green">RiverScore?</span>
           </h2>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
             Nossa inteligência analisa o DNA do prato para garantir que você saiba 
@@ -82,10 +87,10 @@ export function HealthScoreSection() {
             <div className="space-y-6">
               <div className="flex justify-between items-end">
                 <span className="font-black text-slate-800">Processados + Frituras</span>
-                <span className="text-rose-500 font-black">-50 pts</span>
+                <span className="text-score-E font-black">-50 pts</span>
               </div>
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                <motion.div initial={{ width: '100%' }} whileInView={{ width: '20%' }} className="h-full bg-rose-500" />
+                <motion.div initial={{ width: '100%' }} whileInView={{ width: '20%' }} className="h-full bg-score-E" />
               </div>
             </div>
           </div>
@@ -113,20 +118,21 @@ export function HealthScoreSection() {
                   className={`
                     group flex items-center justify-between p-5 rounded-2xl border-2 transition-all duration-300
                     ${activeTags.includes(tag.id) 
-                      ? (tag.type === 'pos' ? 'border-river-green bg-river-green/5' : 'border-rose-500 bg-rose-500/5') 
+                      ? (tag.type === 'pos' ? 'border-river-green bg-river-green/5' : 'border-score-E bg-score-E/5') 
                       : 'border-slate-200 bg-white hover:border-slate-300'}
                   `}
                 >
                   <span className={`font-bold text-sm ${activeTags.includes(tag.id) ? 'text-slate-800' : 'text-slate-500'}`}>
                     {tag.label}
                   </span>
-                  <div className={`p-1.5 rounded-lg transition-colors ${activeTags.includes(tag.id) ? (tag.type === 'pos' ? 'bg-river-green text-white' : 'bg-rose-500 text-white') : 'bg-slate-100 text-slate-400'}`}>
+                  <div className={`p-1.5 rounded-lg transition-colors ${activeTags.includes(tag.id) ? (tag.type === 'pos' ? 'bg-river-green text-white' : 'bg-score-E text-white') : 'bg-slate-100 text-slate-400'}`}>
                     {tag.type === 'pos' ? <Plus size={16} weight="bold" /> : <Minus size={16} weight="bold" />}
                   </div>
                 </button>
               ))}
             </div>
 
+            
             {/* Display da Nota Neon-Dark */}
             <div className="lg:col-span-5 bg-slate-800 rounded-[3.5rem] p-10 flex flex-col items-center justify-center relative overflow-hidden text-center shadow-2xl min-h-[400px]">
               <AnimatePresence mode="wait">
@@ -137,25 +143,26 @@ export function HealthScoreSection() {
                   exit={{ scale: 0.8, opacity: 0 }}
                   className="relative z-10 flex flex-col items-center gap-6"
                 >
-                  <div className={`w-32 h-32 rounded-[2.5rem] ${scoreResult.color} ${scoreResult.shadow} flex items-center justify-center text-6xl font-black text-white shadow-2xl transition-all duration-500`}>
+                  {/* O quadrado principal com a Letra (Puxando a cor de fundo do utilitário) */}
+                  <div className={`w-32 h-32 rounded-[2.5rem] ${scoreResult.color} ${scoreResult.textColor} flex items-center justify-center text-7xl font-black shadow-2xl shadow-black/50 transition-all duration-500`}>
                     {scoreResult.letter}
                   </div>
                   
-                  <div className="space-y-1">
-                    <span className={`text-sm font-black uppercase tracking-widest ${scoreResult.letter === 'A' ? 'text-river-green' : scoreResult.letter === 'B' ? 'text-orange-400' : 'text-rose-500'}`}>
-                      {scoreResult.text}
-                    </span>
-                    <p className="text-slate-400 text-xs px-8 leading-relaxed">
-                      {scoreResult.letter === 'A' && "Este prato é um combustível premium para o seu corpo."}
-                      {scoreResult.letter === 'B' && "Uma escolha equilibrada. Bom para variar o cardápio."}
-                      {scoreResult.letter === 'C' && "Tente substituir por opções menos processadas."}
+                  <div className="space-y-2">
+                    {/* Título SEMPRE branco para contraste máximo com o fundo slate-800 */}
+                    <h4 className="text-xl font-black uppercase tracking-widest text-white">
+                      {scoreResult.label}
+                    </h4>
+                    {/* Descrição em um tom de cinza claro/gelo, super legível */}
+                    <p className="text-slate-300 text-sm px-8 leading-relaxed font-medium">
+                      {scoreResult.description}
                     </p>
                   </div>
                 </motion.div>
               </AnimatePresence>
 
               {/* Detalhes Tech de Fundo */}
-              <div className="absolute inset-0 opacity-5 pointer-events-none">
+              <div className="absolute inset-0 opacity-10 pointer-events-none">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-[1px] border-white rounded-full border-dashed animate-[spin_20s_linear_infinite]" />
               </div>
             </div>

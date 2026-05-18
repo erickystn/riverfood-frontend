@@ -101,7 +101,7 @@ export function Checkout() {
       clearCart();
       
       // Quando criarmos a tela, mudaremos para /meus-pedidos
-      navigate('/'); 
+      navigate('/meus-pedidos'); 
 
     } catch (error: any) {
       console.error(error);

@@ -1,16 +1,24 @@
+// src/components/ProtectedRoute.tsx
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 
 export function ProtectedRoute() {
-  const { isLogged } = useAuthStore();
+  // Agora pegamos o 'user' também para saber o tipo!
+  const { isLogged, user } = useAuthStore();
   const location = useLocation();
 
-  // Se não estiver logado, mandamos para o login, 
-  // mas salvamos de onde ele veio (state) para poder voltar depois!
+  // REGRA 1: Não está logado de jeito nenhum? Vai para o login.
   if (!isLogged) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // O Outlet é onde as páginas "filhas" vão aparecer
+  // REGRA 2: A BLINDAGEM DO CLIENTE
+  // Se quem está logado for um RESTAURANTE tentando bisbilhotar área de cliente, 
+  // joga ele de volta para a "Cozinha" dele.
+  if (user?.tipo === 'RESTAURANTE') {
+    return <Navigate to="/restaurante/dashboard" replace />;
+  }
+
+  // Se passou pelas duas regras, é um CLIENTE autenticado.
   return <Outlet />;
 }
