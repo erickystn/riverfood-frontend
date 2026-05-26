@@ -2,100 +2,183 @@
 import { useEffect, useState } from 'react';
 import { ProductCard } from '../components/ProductCard';
 import { api } from '../services/api';
-import { Leaf, Sparkle, MagnifyingGlass, Info, Fire } from '@phosphor-icons/react';
+import { Leaf, Sparkle, Info, ArrowRight, Fire, Carrot } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { getHealthScoreDetails } from '../utils/healthScore';
 import { HealthScoreSection } from '../components/HealthScoreSection';
+import { ServerOffline } from '../components/ServerOffline';
+import { motion, AnimatePresence } from 'framer-motion'; // 💡 Importamos o Framer Motion
+
+// 💡 DADOS DO SLIDER (O coração da sua nova UX)
+const heroSlides = [
+  {
+    id: 0,
+    badge: "O Delivery que Cuida de Você",
+    icon: <Leaf size={16} weight="bold" />,
+    title: "Transparência total no seu prato.",
+    description: "Da salada in-natura ao hambúrguer do fim de semana, você decide o que comer com base no nosso exclusivo HealthScore.",
+    ctaText: "Ver Cardápio Completo",
+    query: "", // Vazio para mostrar tudo
+    bgImage: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200",
+  },
+  {
+    id: 1,
+    badge: "Frescor Diário",
+    icon: <Carrot size={16} weight="bold" />,
+    title: "O Poder das Folhas Verdes.",
+    description: "Saladas orgânicas, crocantes e ricas em nutrientes para um almoço leve e cheio de energia.",
+    ctaText: "Explorar Saladas",
+    query: "salada",
+    bgImage: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200",
+  },
+  {
+    id: 2,
+    badge: "Leveza Oriental",
+    icon: <Sparkle size={16} weight="bold" />,
+    title: "A arte do Sushi saudável.",
+    description: "Peixes frescos, combinados leves e muito sabor. A opção perfeita para não sair da dieta curtindo um bom japonês.",
+    ctaText: "Explorar Sushis",
+    query: "hot roll", // 💡 Manda buscar direto por "sushi"
+    bgImage: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1200", // Foto de combinados de sushi do Unsplash
+  }
+];
 
 export function Home() {
   const navigate = useNavigate();
   const [topProducts, setTopProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [buscaExPressa, setBuscaExpressa] = useState('');
+  const [isOffline, setIsOffline] = useState(false);
+
+  // 💡 ESTADO DO SLIDER
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // 💡 AUTO-PLAY DO SLIDER (Muda a cada 5 segundos)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  async function fetchTopHealthy() {
+    try {
+      setLoading(true);
+      setIsOffline(false);
+
+      const response = await api.get('/produtos/recomendados');
+      setTopProducts(response.data.slice(0, 8));
+    } catch (error: any) {
+      console.error("Erro ao carregar recomendados", error);
+      if (!error.response || error.code === 'ERR_NETWORK') {
+        setIsOffline(true);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchTopHealthy() {
-      try {
-        const response = await api.get('/produtos/recomendados');
-        setTopProducts(response.data.slice(0, 8)); // 8 para manter 2 linhas fechadas
-      } catch (error) {
-        console.error("Erro ao carregar recomendados", error);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchTopHealthy();
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (buscaExPressa.trim()) {
-      navigate(`/search?busca=${encodeURIComponent(buscaExPressa)}`);
+  // 💡 FUNÇÃO DE NAVEGAÇÃO DO CTA
+  const handleCtaClick = (query: string) => {
+    if (query) {
+      navigate(`/search?busca=${encodeURIComponent(query)}`);
+    } else {
+      navigate('/search');
     }
   };
 
+  if (isOffline) {
+    return <ServerOffline onRetry={fetchTopHealthy} />;
+  }
+
   return (
     <div className="pb-16 space-y-16 animate-fade-in">
-      
-      {/* 1. HERO COMPACTO & CONVERSIVO */}
-      <section className="bg-river-dark rounded-[3rem] p-10 md:p-14 relative overflow-hidden flex flex-col items-center text-center shadow-2xl">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
-        
-        <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 bg-river-light/20 text-river-green px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest backdrop-blur-sm border border-river-green/20">
-            <Leaf size={16} weight="bold" />
-            O Delivery que Cuida de Você
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight tracking-tight">
-            Transparência total no seu prato.
-          </h1>
-          
-          <p className="text-slate-300 font-medium text-lg">
-            Da salada in-natura ao hambúrguer do fim de semana, você decide o que comer com base no nosso exclusivo HealthScore (A ao E).
-          </p>
 
-          {/* Barra de Busca Expressa que redireciona pro /search */}
-          <form onSubmit={handleSearch} className="flex bg-white p-2 rounded-full shadow-lg mx-auto max-w-lg mt-8 transition-all focus-within:ring-4 focus-within:ring-river-green/30">
-            <div className="flex-1 flex items-center px-4">
-              <MagnifyingGlass size={20} className="text-slate-400" />
-              <input 
-                type="text" 
-                value={buscaExPressa}
-                onChange={(e) => setBuscaExpressa(e.target.value)}
-                placeholder="O que você quer comer hoje?" 
-                className="w-full bg-transparent outline-none text-slate-800 font-medium px-3 placeholder:text-slate-400"
-              />
+      {/* 1. HERO SLIDER ANIMADO (Fim da barra de busca redundante!) */}
+      <section className="bg-river-dark rounded-[3rem] relative overflow-hidden flex flex-col items-center text-center shadow-2xl min-h-[450px] justify-center">
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-10 md:p-14"
+          >
+            {/* Imagem de Fundo Dinâmica */}
+            <div
+              className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-20"
+              style={{ backgroundImage: `url(${heroSlides[currentSlide].bgImage})` }}
+            />
+
+            {/* Conteúdo Dinâmico */}
+            <div className="relative z-10 max-w-2xl mx-auto space-y-6 w-full flex flex-col items-center">
+              <div className="inline-flex items-center gap-2 bg-river-light/20 text-river-green px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest backdrop-blur-sm border border-river-green/20">
+                {heroSlides[currentSlide].icon}
+                {heroSlides[currentSlide].badge}
+              </div>
+
+              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-md">
+                {heroSlides[currentSlide].title}
+              </h1>
+
+              <p className="text-slate-300 font-medium text-lg max-w-xl">
+                {heroSlides[currentSlide].description}
+              </p>
+
+              <div className="pt-6">
+                <button
+                  onClick={() => handleCtaClick(heroSlides[currentSlide].query)}
+                  className="bg-river-green text-river-dark font-black px-8 py-4 rounded-full hover:bg-emerald-400 transition-all flex items-center gap-2 shadow-lg hover:shadow-river-green/30 hover:-translate-y-1"
+                >
+                  {heroSlides[currentSlide].ctaText} <ArrowRight size={18} weight="bold" />
+                </button>
+              </div>
             </div>
-            <button type="submit" className="bg-river-green text-river-dark font-black px-6 py-3 rounded-full hover:bg-emerald-500 transition-colors">
-              Buscar
-            </button>
-          </form>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* 💡 CONTROLES DO SLIDER (As bolinhas de navegação) */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide ? 'bg-river-green w-8 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-white/30 hover:bg-white/50 w-2'}`}
+              aria-label={`Ir para o slide ${index + 1}`}
+            />
+          ))}
         </div>
       </section>
 
-      {/* 2. LEGENDA DO HEALTH SCORE (Disruptivo) */}
+      {/* 2. LEGENDA DO HEALTH SCORE */}
       <section className="max-w-5xl mx-auto px-4">
-        <div className="flex items-center gap-2 text-river-dark mb-6 justify-center">
-          <Info size={24} weight="duotone" className="text-river-green" />
-          <h2 className="text-xl font-black tracking-tight">Entenda o RiverScore</h2>
-        </div>
-        
-        <div className="flex flex-wrap justify-center gap-3">
-          {[100, 80, 60, 40, 10].map(score => {
-            const data = getHealthScoreDetails(score);
-            return (
-              <div key={data.letter} className="flex items-center gap-3 bg-surface-card px-5 py-3 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-help group" title={data.description}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black ${data.color} ${data.textColor}`}>
-                  {data.letter}
+        <a href="#entenda">
+          <div className="flex items-center gap-2 text-river-dark mb-6 justify-center">
+            <Info size={24} weight="duotone" className="text-river-green" />
+            <h2 className="text-xl font-black tracking-tight">Entenda o RiverScore</h2>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3">
+            {[100, 80, 60, 40, 10].map(score => {
+              const data = getHealthScoreDetails(score);
+              return (
+                <div key={data.letter} className="flex items-center gap-3 bg-surface-card px-5 py-3 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-help group" title={data.description}>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black ${data.color} ${data.textColor}`}>
+                    {data.letter}
+                  </div>
+                  <span className="text-xs font-bold text-slate-600 uppercase tracking-widest group-hover:text-river-dark transition-colors">
+                    {data.label}
+                  </span>
                 </div>
-                <span className="text-xs font-bold text-slate-600 uppercase tracking-widest group-hover:text-river-dark transition-colors">
-                  {data.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </a>
       </section>
 
       {/* 3. VITRINE DE DESTAQUES */}
@@ -112,7 +195,7 @@ export function Home() {
               <p className="text-sm text-surface-muted">Nossas melhores recomendações (Notas A e B)</p>
             </div>
           </div>
-          
+
           <button onClick={() => navigate('/search')} className="hidden sm:block text-river-green font-black uppercase text-xs tracking-widest hover:text-river-dark transition-colors">
             Ver Cardápio Completo
           </button>
@@ -132,7 +215,8 @@ export function Home() {
           </div>
         )}
       </section>
-      <HealthScoreSection/>
+
+      <HealthScoreSection />
 
     </div>
   );

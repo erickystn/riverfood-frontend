@@ -2,7 +2,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DefaultLayout } from "./components/DefaultLayout";
 import { Home } from "./pages/Home";
-import { Login } from "./pages/Login"; // O nosso super login unificado
+import { Login } from "./pages/Login"; 
 import { AdminLayout } from "./components/AdminLayout";
 import { Dashboard } from "./pages/admin/Dashboard";
 import { NewProduct } from "./pages/admin/NewProduct";
@@ -17,6 +17,8 @@ import { MeusPedidos } from "./pages/MeusPedidos";
 import { RestaurantePage } from "./pages/RestaurantePage";
 import { Profile } from "./pages/Profile";
 import { Orders } from "./pages/admin/Orders";
+import { DeliveryView } from "./pages/admin/DeliveryView";
+import { Fleet } from "./pages/admin/Fleet";
 
 export function App() {
   return (
@@ -24,6 +26,12 @@ export function App() {
       <Routes>
         {/* ROTA UNIFICADA DE LOGIN */}
         <Route path="/login" element={<Login />} />
+
+        {/* =========================================
+            MUNDO DA FROTA: ENTREGADOR (Sem Sidebar)
+            ========================================= */}
+        {/* 💡 Tiramos o DeliveryView de dentro do AdminLayout para ele ocupar a tela toda */}
+        <Route path="/entregas" element={<DeliveryView />} />
 
         {/* =========================================
             MUNDO B2B: RESTAURANTE (Protegido e Blindado)
@@ -35,6 +43,7 @@ export function App() {
           <Route path="produtos/editar/:id" element={<EditProduct />} />
           <Route path="perfil" element={<ProfileRestaurante />} />
           <Route path="pedidos" element={<Orders />} />
+          <Route path="frota" element={<Fleet />} /> {/* 💡 Corrigido: removido a barra inicial */}
         </Route>
 
         {/* =========================================
@@ -43,13 +52,13 @@ export function App() {
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<Home />} />
           <Route path="search" element={<Search />} />
-          <Route path="/restaurante/:id" element={<RestaurantePage />} />
+          <Route path="restaurante/:id" element={<RestaurantePage />} /> {/* 💡 Corrigido: removido a barra inicial */}
+          
           {/* ÁREA PRIVADA DO CLIENTE */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/perfil" element={<Profile />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/meus-pedidos" element={<MeusPedidos />} />
-            {/* <Route path="/perfil" element={<Perfil />} />  */}
+            <Route path="perfil" element={<Profile />} /> {/* 💡 Corrigido: removido as barras iniciais */}
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="meus-pedidos" element={<MeusPedidos />} />
           </Route>
         </Route>
 

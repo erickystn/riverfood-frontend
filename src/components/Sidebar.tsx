@@ -6,7 +6,8 @@ import {
   PlusCircle,
   SignOut,
   Leaf,
-  Receipt // 💡 Ícone novo para a aba de Pedidos
+  Receipt, // 💡 Ícone novo para a aba de Pedidos // 💡 Ícone novo para a aba de Pedidos
+  MotorcycleIcon
 } from '@phosphor-icons/react';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -68,15 +69,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           <SquaresFour size={20} weight="bold" />
           Dashboard
         </Link>
-
-        {/* 💡 NOVO: Link para a futura página de Pedidos */}
         <Link 
-          to="/restaurante/pedidos" 
+          to="/restaurante/produtos/novo" 
           onClick={onClose} 
-          className={linkClass('/restaurante/pedidos')}
+          className={linkClass('/restaurante/produtos/novo')}
         >
-          <Receipt size={20} weight="bold" />
-          Gestão de Pedidos
+          <PlusCircle size={20} weight="bold" />
+          Novo Prato
         </Link>
 
         <Link 
@@ -88,13 +87,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           Meus Produtos
         </Link>
 
+        {/* 💡 NOVO: Link para a futura página de Pedidos */}
         <Link 
-          to="/restaurante/produtos/novo" 
+          to="/restaurante/pedidos" 
           onClick={onClose} 
-          className={linkClass('/restaurante/produtos/novo')}
+          className={linkClass('/restaurante/pedidos')}
         >
-          <PlusCircle size={20} weight="bold" />
-          Novo Prato
+          <Receipt size={20} weight="bold" />
+          Gestão de Pedidos
+        </Link>
+
+        
+
+        <Link 
+          to="/restaurante/frota" 
+          onClick={onClose} 
+          className={linkClass('/restaurante/frota')}
+        >
+          <MotorcycleIcon size={20} weight="bold" />
+          Minha Frota
         </Link>
       </nav>
 

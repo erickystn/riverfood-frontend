@@ -20,7 +20,6 @@ export function Login() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Extrai o tipo da URL (ex: /login?type=restaurante) ou define CLIENTE como padrão
   const typeParam = searchParams.get('type');
   const initialMode: TipoUsuario = typeParam === 'restaurante' ? 'RESTAURANTE' : 'CLIENTE';
 
@@ -28,7 +27,6 @@ export function Login() {
   const isLogged = useAuthStore((state) => state.isLogged);
   const user = useAuthStore((state) => state.user);
 
-  // Estados locais
   const [viewMode, setViewMode] = useState<TipoUsuario>(initialMode);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -36,22 +34,22 @@ export function Login() {
   const [nome, setNome] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Atualiza o estado interno se a URL mudar (ao clicar no menu principal)
   useEffect(() => {
     setViewMode(initialMode);
   }, [initialMode]);
 
-  // Se já estiver logado, redireciona para o lugar certo
+  // 💡 1. REDIRECIONAMENTO DE SEGURANÇA (Se já estiver logado)
   if (isLogged && user) {
-    return <Navigate to={user.tipo === 'RESTAURANTE' ? "/restaurante/dashboard" : "/"} replace />;
+    if (user.tipo === 'RESTAURANTE') return <Navigate to="/restaurante/dashboard" replace />;
+    if (user.tipo === 'ENTREGADOR') return <Navigate to="/entregas" replace />; // Bloqueia o motoboy de ver o painel
+    return <Navigate to="/" replace />;
   }
 
-  // Função para alternar a visão visualmente e na URL
   const toggleViewMode = () => {
     const newMode = viewMode === 'CLIENTE' ? 'RESTAURANTE' : 'CLIENTE';
     setViewMode(newMode);
     setSearchParams({ type: newMode.toLowerCase() });
-    setIsLogin(true); // Reseta para a tela de login ao trocar de modo
+    setIsLogin(true); 
   };
 
   async function handleAuthenticate(e: React.FormEvent) {
@@ -70,13 +68,17 @@ export function Login() {
         setLogin({ id, nome, usuario, tipo }, token);
         toast.success(`Bem-vindo, ${nome}!`);
 
-        navigate(tipo === 'RESTAURANTE' ? '/restaurante/dashboard' : '/');
+        // 💡 2. REDIRECIONAMENTO APÓS SUCESSO DE LOGIN
+        if (tipo === 'RESTAURANTE') navigate('/restaurante/dashboard');
+        else if (tipo === 'ENTREGADOR') navigate('/entregas');
+        else navigate('/');
+        
       } else {
         await api.post('/usuarios/cadastrar', {
           nome: nome,
           usuario: email,
           senha: password,
-          tipo: viewMode // O cadastro agora respeita a aba que o usuário está vendo!
+          tipo: viewMode 
         });
 
         setNome("");
@@ -94,15 +96,12 @@ export function Login() {
     }
   }
 
-  // ==========================================
-  // VARIÁVEIS VISUAIS DINÂMICAS (A Mágica da UX)
-  // ==========================================
   const isCliente = viewMode === 'CLIENTE';
   
   const theme = {
     bgBanner: isCliente 
-      ? "bg-[url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200')]" // Comida saudável
-      : "bg-[url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200')]", // Dashboard/Restaurante
+      ? "bg-[url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200')]" 
+      : "bg-[url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1200')]", 
     title: isCliente ? "Peça comida saudável com consciência." : "A plataforma de gestão para o seu restaurante.",
     icon: isCliente ? <Leaf size={24} weight="fill" /> : <Storefront size={24} weight="fill" />,
     formTitle: isLogin 
@@ -120,7 +119,6 @@ export function Login() {
   return (
     <div className="min-h-screen flex bg-surface-bg font-sans">
       
-      {/* LADO ESQUERDO: Branding Dinâmico */}
       <div className={`hidden lg:flex lg:w-1/2 ${isCliente ? 'bg-river-green' : 'bg-river-dark'} relative flex-col justify-between p-12 overflow-hidden transition-colors duration-500`}>
         <div className={`absolute inset-0 ${theme.bgBanner} opacity-20 bg-cover bg-center mix-blend-overlay transition-all duration-500`}></div>
         
@@ -144,16 +142,13 @@ export function Login() {
         </div>
       </div>
 
-      {/* LADO DIREITO: Formulário */}
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12 relative overflow-y-auto">
         
-        {/* Link voltar mobile */}
         <Link to="/" className="lg:hidden absolute top-8 left-8 text-surface-muted hover:text-river-dark transition-colors flex items-center gap-2">
           <ArrowLeft size={24} weight="bold" />
           <span className="text-sm font-bold">Início</span>
         </Link>
 
-        {/* Botão de Alternar Visão (No topo direito) */}
         <button 
           onClick={toggleViewMode}
           className="absolute top-8 right-8 flex items-center gap-2 text-xs font-bold text-surface-muted hover:text-river-dark transition-colors border border-slate-200 px-4 py-2 rounded-full shadow-sm hover:shadow-md bg-white"
@@ -189,7 +184,7 @@ export function Login() {
                     type="text" 
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
-                    placeholder={isCliente ? "Ex: Erick Braga" : "Ex: Fit da Praça"} 
+                    placeholder={isCliente ? "Ex: Nome Completo" : "Ex: Fit da Praça"} 
                     className="w-full bg-surface-bg border border-slate-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-river-green transition-all"
                     required={!isLogin}
                   />
@@ -216,7 +211,6 @@ export function Login() {
               <div className="flex items-center justify-between ml-1">
                 <label className="text-xs font-bold text-surface-muted uppercase">Palavra-passe</label>
                 
-                {/* BOTÃO ESQUECEU A SENHA (Ainda sem rota) */}
                 {isLogin && (
                   <button 
                     type="button"

@@ -2,8 +2,13 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Heartbeat, Leaf, ThermometerHot, ShieldCheck, 
-  Plus, Minus, ArrowsCounterClockwise 
+  ShieldCheck, 
+  Plus, 
+  Minus, 
+  ArrowsCounterClockwise,
+  Calculator,
+  ArrowRight,
+  Equals
 } from '@phosphor-icons/react';
 import { getHealthScoreDetails } from '../utils/healthScore';
 
@@ -30,8 +35,6 @@ export function HealthScoreSection() {
     
     // Trava a nota final para nunca passar de 100 nem ficar negativa
     const finalScore = Math.min(Math.max(score, 0), 100);
-    
-    // 🔮 A MÁGICA: O Utilitário resolve a letra, cor e os textos!
     return getHealthScoreDetails(finalScore);
     
   }, [activeTags]);
@@ -41,70 +44,93 @@ export function HealthScoreSection() {
   };
 
   return (
-    <section className="py-24 px-6 bg-slate-50/50">
+    <section id="entenda" className="py-24 px-6 bg-slate-50/50">
       <div className="max-w-6xl mx-auto">
         
-        {/* === PARTE 1: A EXPLICAÇÃO LÚDICA === */}
+        {/* === PARTE 1: A EXPLICAÇÃO DIDÁTICA (Abertura da Caixa Preta) === */}
         <div className="text-center mb-16 space-y-4">
-          <span className="text-river-green font-black text-xs uppercase tracking-[0.3em]">Tecnologia Nutricional</span>
+          <span className="text-river-green font-black text-xs uppercase tracking-[0.3em]">Transparência Nutricional</span>
           <h2 className="text-4xl md:text-5xl font-black text-slate-800">
-            Como funciona o <span className="text-river-green">RiverScore?</span>
+            A Matemática do <span className="text-river-green">RiverScore</span>
           </h2>
           <p className="text-slate-600 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-            Nossa inteligência analisa o DNA do prato para garantir que você saiba 
-            exatamente o que está colocando no corpo.
+            Nada de "achismos" ou letras aleatórias. Nosso sistema analisa o DNA do prato através de uma equação simples e rigorosa. Veja como calculamos a sua saúde:
           </p>
         </div>
 
-        {/* Pilares */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-          {[
-            { title: "Origem", desc: "Ingredientes in-natura e sem conservantes.", icon: <Leaf size={32} weight="duotone" className="text-river-green" />, bg: "bg-emerald-50" },
-            { title: "Preparo", desc: "Técnicas que preservam nutrientes e sabor.", icon: <ThermometerHot size={32} weight="duotone" className="text-orange-500" />, bg: "bg-orange-50" },
-            { title: "Equilíbrio", desc: "Dose certa de fibras e baixo sódio.", icon: <Heartbeat size={32} weight="duotone" className="text-cyan-500" />, bg: "bg-cyan-50" }
-          ].map((pilar, i) => (
-            <div key={i} className={`p-8 rounded-[2.5rem] border-2 border-transparent ${pilar.bg} hover:border-white hover:shadow-xl transition-all duration-300`}>
-              <div className="mb-4">{pilar.icon}</div>
-              <h3 className="text-xl font-black text-slate-800 mb-2">{pilar.title}</h3>
-              <p className="text-slate-600 text-sm font-medium leading-relaxed">{pilar.desc}</p>
-            </div>
-          ))}
-        </div>
+        {/* O FLUXO DA EQUAÇÃO */}
+        <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-lg border border-slate-100 mb-20 relative">
+          
+          {/* Conectores Visuais (Escondidos no mobile) */}
+          <div className="hidden lg:block absolute top-[50%] left-0 w-full h-1 bg-slate-50 -z-0"></div>
 
-        {/* Barras de Impacto (Visual de "Vida") */}
-        <div className="bg-white rounded-[3.5rem] p-8 md:p-12 shadow-sm border border-slate-100 mb-20">
-          <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-10 text-center">Peso das Escolhas</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="space-y-6">
-              <div className="flex justify-between items-end">
-                <span className="font-black text-slate-800">Orgânicos + Cozimento Leve</span>
-                <span className="text-river-green font-black">+25 pts</span>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative z-10">
+            
+            {/* Passo 1: Base */}
+            <div className="bg-white rounded-3xl p-6 border-2 border-slate-100 text-center flex flex-col items-center relative shadow-sm hover:-translate-y-2 transition-transform">
+              <div className="w-14 h-14 bg-slate-800 text-white rounded-2xl flex items-center justify-center font-black text-xl mb-4 shadow-lg shadow-slate-800/20">
+                70
               </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                <motion.div initial={{ width: 0 }} whileInView={{ width: '85%' }} className="h-full bg-river-green" />
-              </div>
-            </div>
-            <div className="space-y-6">
-              <div className="flex justify-between items-end">
-                <span className="font-black text-slate-800">Processados + Frituras</span>
-                <span className="text-score-E font-black">-50 pts</span>
-              </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                <motion.div initial={{ width: '100%' }} whileInView={{ width: '20%' }} className="h-full bg-score-E" />
+              <h3 className="font-black text-slate-800 mb-2">Nota Base</h3>
+              <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                Todo prato cadastrado no sistema começa com 70 pontos neutros (Nota B).
+              </p>
+              <div className="absolute -right-6 top-[40%] hidden lg:flex items-center justify-center bg-white w-8 h-8 rounded-full border border-slate-200 text-slate-300">
+                <Plus size={16} weight="bold" />
               </div>
             </div>
+
+            {/* Passo 2: Bônus */}
+            <div className="bg-white rounded-3xl p-6 border-2 border-emerald-100 text-center flex flex-col items-center relative shadow-sm hover:-translate-y-2 transition-transform">
+              <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center font-black text-2xl mb-4">
+                <Plus weight="bold" />
+              </div>
+              <h3 className="font-black text-emerald-700 mb-2">Bônus Nutricional</h3>
+              <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                Adicionamos de <strong className="text-emerald-600">+10 a +15 pontos</strong> se o prato for orgânico, rico em fibras ou cozido no vapor.
+              </p>
+              <div className="absolute -right-6 top-[40%] hidden lg:flex items-center justify-center bg-white w-8 h-8 rounded-full border border-slate-200 text-slate-300">
+                <Minus size={16} weight="bold" />
+              </div>
+            </div>
+
+            {/* Passo 3: Pênaltis */}
+            <div className="bg-white rounded-3xl p-6 border-2 border-red-100 text-center flex flex-col items-center relative shadow-sm hover:-translate-y-2 transition-transform">
+              <div className="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center font-black text-2xl mb-4">
+                <Minus weight="bold" />
+              </div>
+              <h3 className="font-black text-red-700 mb-2">Pênaltis Críticos</h3>
+              <p className="text-xs font-medium text-slate-500 leading-relaxed">
+                Subtraímos de <strong className="text-red-600">-20 a -50 pontos</strong> se houver fritura em imersão, ultraprocessados ou excesso de sódio.
+              </p>
+              <div className="absolute -right-6 top-[40%] hidden lg:flex items-center justify-center bg-white w-8 h-8 rounded-full border border-slate-200 text-slate-300">
+                <Equals size={16} weight="bold" />
+              </div>
+            </div>
+
+            {/* Passo 4: Resultado */}
+            <div className="bg-slate-900 rounded-3xl p-6 border-2 border-slate-800 text-center flex flex-col items-center relative shadow-xl hover:-translate-y-2 transition-transform">
+              <div className="w-14 h-14 bg-river-green text-river-dark rounded-2xl flex items-center justify-center font-black text-xl mb-4">
+                A-E
+              </div>
+              <h3 className="font-black text-white mb-2">O Veredito</h3>
+              <p className="text-xs font-medium text-slate-300 leading-relaxed">
+                A soma final define a letra. Acima de 90 é <strong className="text-river-green">A</strong>. Abaixo de 40 vira <strong className="text-score-E">E</strong>. Transparente e direto.
+              </p>
+            </div>
+
           </div>
         </div>
 
-        {/* === PARTE 2: O SIMULADOR INTERATIVO === */}
+        {/* === PARTE 2: O SIMULADOR INTERATIVO (O Laboratório) === */}
         <div className="pt-12 border-t border-slate-200">
           <div className="flex flex-col md:flex-row items-center gap-6 mb-12">
-             <div className="bg-river-dark p-3 rounded-2xl text-white">
-                <ArrowsCounterClockwise size={28} weight="bold" />
+             <div className="bg-river-dark p-4 rounded-3xl text-river-green shadow-lg shadow-river-dark/20">
+                <Calculator size={32} weight="duotone" />
              </div>
              <div className="text-center md:text-left">
-                <h3 className="text-2xl font-black text-slate-800">Laboratório Interativo</h3>
-                <p className="text-slate-500 font-medium">Faça o teste: combine os elementos e veja a nota mudar.</p>
+                <h3 className="text-3xl font-black text-slate-800">Laboratório Interativo</h3>
+                <p className="text-slate-500 font-medium text-lg mt-1">Ligue e desligue os ingredientes abaixo e veja o algoritmo recalcular a nota ao vivo.</p>
              </div>
           </div>
 
@@ -119,22 +145,28 @@ export function HealthScoreSection() {
                     group flex items-center justify-between p-5 rounded-2xl border-2 transition-all duration-300
                     ${activeTags.includes(tag.id) 
                       ? (tag.type === 'pos' ? 'border-river-green bg-river-green/5' : 'border-score-E bg-score-E/5') 
-                      : 'border-slate-200 bg-white hover:border-slate-300'}
+                      : 'border-slate-200 bg-white hover:border-slate-300 shadow-sm hover:shadow-md'}
                   `}
                 >
-                  <span className={`font-bold text-sm ${activeTags.includes(tag.id) ? 'text-slate-800' : 'text-slate-500'}`}>
-                    {tag.label}
-                  </span>
-                  <div className={`p-1.5 rounded-lg transition-colors ${activeTags.includes(tag.id) ? (tag.type === 'pos' ? 'bg-river-green text-white' : 'bg-score-E text-white') : 'bg-slate-100 text-slate-400'}`}>
-                    {tag.type === 'pos' ? <Plus size={16} weight="bold" /> : <Minus size={16} weight="bold" />}
+                  <div className="flex flex-col items-start">
+                    <span className={`font-black text-sm ${activeTags.includes(tag.id) ? 'text-slate-800' : 'text-slate-500'}`}>
+                      {tag.label}
+                    </span>
+                    {/* 💡 Novo: Mostra exatamente o peso daquela tag no botão */}
+                    <span className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${tag.type === 'pos' ? 'text-emerald-500' : 'text-red-500'}`}>
+                      {tag.points > 0 ? `+${tag.points} pts` : `${tag.points} pts`}
+                    </span>
+                  </div>
+                  
+                  <div className={`p-2 rounded-xl transition-colors ${activeTags.includes(tag.id) ? (tag.type === 'pos' ? 'bg-river-green text-white' : 'bg-score-E text-white') : 'bg-slate-100 text-slate-400'}`}>
+                    {tag.type === 'pos' ? <Plus size={20} weight="bold" /> : <Minus size={20} weight="bold" />}
                   </div>
                 </button>
               ))}
             </div>
 
-            
             {/* Display da Nota Neon-Dark */}
-            <div className="lg:col-span-5 bg-slate-800 rounded-[3.5rem] p-10 flex flex-col items-center justify-center relative overflow-hidden text-center shadow-2xl min-h-[400px]">
+            <div className="lg:col-span-5 bg-slate-900 rounded-[3.5rem] p-10 flex flex-col items-center justify-center relative overflow-hidden text-center shadow-2xl min-h-[400px] border border-slate-800">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={scoreResult.letter}
@@ -143,18 +175,16 @@ export function HealthScoreSection() {
                   exit={{ scale: 0.8, opacity: 0 }}
                   className="relative z-10 flex flex-col items-center gap-6"
                 >
-                  {/* O quadrado principal com a Letra (Puxando a cor de fundo do utilitário) */}
+                  {/* O quadrado principal com a Letra */}
                   <div className={`w-32 h-32 rounded-[2.5rem] ${scoreResult.color} ${scoreResult.textColor} flex items-center justify-center text-7xl font-black shadow-2xl shadow-black/50 transition-all duration-500`}>
                     {scoreResult.letter}
                   </div>
                   
-                  <div className="space-y-2">
-                    {/* Título SEMPRE branco para contraste máximo com o fundo slate-800 */}
-                    <h4 className="text-xl font-black uppercase tracking-widest text-white">
+                  <div className="space-y-3">
+                    <h4 className="text-2xl font-black uppercase tracking-widest text-white">
                       {scoreResult.label}
                     </h4>
-                    {/* Descrição em um tom de cinza claro/gelo, super legível */}
-                    <p className="text-slate-300 text-sm px-8 leading-relaxed font-medium">
+                    <p className="text-slate-400 text-sm px-6 leading-relaxed font-medium">
                       {scoreResult.description}
                     </p>
                   </div>
@@ -162,8 +192,8 @@ export function HealthScoreSection() {
               </AnimatePresence>
 
               {/* Detalhes Tech de Fundo */}
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-[1px] border-white rounded-full border-dashed animate-[spin_20s_linear_infinite]" />
+              <div className="absolute inset-0 opacity-20 pointer-events-none">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-[1px] border-river-light rounded-full border-dashed animate-[spin_30s_linear_infinite]" />
               </div>
             </div>
           </div>
@@ -171,9 +201,9 @@ export function HealthScoreSection() {
 
         {/* Selo de Garantia */}
         <div className="mt-16 flex justify-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white border border-slate-200 shadow-sm">
+          <div className="inline-flex items-center gap-3 px-6 py-4 rounded-full bg-white border border-slate-200 shadow-sm">
             <ShieldCheck size={24} weight="fill" className="text-river-green" />
-            <span className="text-sm font-bold text-slate-700">Algoritmo validado por especialistas em nutrição funcional</span>
+            <span className="text-sm font-bold text-slate-700">Lógica baseada em diretrizes de nutrição funcional e transparência do consumidor.</span>
           </div>
         </div>
 

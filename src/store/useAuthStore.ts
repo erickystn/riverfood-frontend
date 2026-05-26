@@ -3,14 +3,15 @@ import { toast } from 'react-toastify';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// 1. Criamos um type para não ter erro de digitação
-export type TipoUsuario = 'CLIENTE' | 'RESTAURANTE';
+// 💡 1. Adicionado 'ENTREGADOR' para alinhar com o nosso novo banco de dados
+export type TipoUsuario = 'CLIENTE' | 'RESTAURANTE' | 'ENTREGADOR';
 
 interface User {
   id: number;
   nome: string;
   usuario: string;
-  tipo: TipoUsuario; // 2. Adicionamos o tipo aqui!
+  tipo: TipoUsuario; 
+  foto?: string; // 💡 2. Adicionado a propriedade opcional para a Sidebar ler a imagem sem reclamar!
 }
 
 interface AuthStore {

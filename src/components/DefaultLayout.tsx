@@ -7,10 +7,18 @@ import { useAuthStore } from '../store/useAuthStore';
 export function DefaultLayout() {
   const { isLogged, user } = useAuthStore();
 
-  // O "GUARDA DE TRÂNSITO" DA VITRINE
+  // =========================================================
+  // O "GUARDA DE TRÂNSITO" DA VITRINE (BLINDAGEM DE ROTAS)
+  // =========================================================
+  
   // Se um restaurante tentar passear pela área de clientes, empurramos ele para o Dashboard
   if (isLogged && user?.tipo === 'RESTAURANTE') {
     return <Navigate to="/restaurante/dashboard" replace />;
+  }
+
+  // Se um entregador tentar passear pela área de clientes, empurramos ele para o App Operacional
+  if (isLogged && user?.tipo === 'ENTREGADOR') {
+    return <Navigate to="/entregas" replace />;
   }
 
   return (

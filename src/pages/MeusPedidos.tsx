@@ -12,7 +12,7 @@ import {
   MapPin,
 } from "@phosphor-icons/react";
 import { toast } from "react-toastify";
-import {OrderDetailModal} from '../components/OrderDetailModal'
+import { OrderDetailModal } from '../components/OrderDetailModal';
 import type { MetodoPagamento } from "./Checkout";
 
 export interface Pedido {
@@ -44,23 +44,35 @@ export interface Pedido {
 export function MeusPedidos() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [pedidoSelecionado, setPedidoSelecionado] = useState<Pedido | null>(
-    null,
-  );
+  const [pedidoSelecionado, setPedidoSelecionado] = useState<Pedido | null>(null);
 
+  // 💡 POLLING AGRESSIVO PARA A DEMONSTRAÇÃO
   useEffect(() => {
-    async function loadPedidos() {
+    async function loadPedidos(isInitialLoad = false) {
       try {
-        // CORREÇÃO AQUI: Usando a rota exata do seu Swagger
+        if (isInitialLoad) setIsLoading(true);
         const response = await api.get("/pedidos");
         setPedidos(response.data);
       } catch (error) {
-        toast.error("Não conseguimos carregar seus pedidos.");
+        // Só exibe o toast de erro no carregamento inicial para não fludar a tela do usuário a cada 3 seg
+        if (isInitialLoad) {
+          toast.error("Não conseguimos carregar seus pedidos.");
+        }
       } finally {
-        setIsLoading(false);
+        if (isInitialLoad) setIsLoading(false);
       }
     }
-    loadPedidos();
+
+    // 1. Chamada inicial (com loading)
+    loadPedidos(true);
+
+    // 2. Loop de atualização silenciosa (sem loading) a cada 3 segundos
+    const interval = setInterval(() => {
+      loadPedidos(false);
+    }, 3000);
+
+    // 3. Limpeza do intervalo quando sair da tela
+    return () => clearInterval(interval);
   }, []);
 
   // Metáfora de Cores para o Status (State Machine visual)
@@ -180,10 +192,10 @@ export function MeusPedidos() {
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <Link to={`/restaurante/${pedido.restaurante.id}`} className="inline-block mb-4 group-hover:text-river-green transition-colors">
-             <h3 className="font-black text-slate-800 text-lg hover:underline">
-                 {pedido.restaurante.nome}
-             </h3>
-        </Link>
+                      <h3 className="font-black text-slate-800 text-lg hover:underline">
+                        {pedido.restaurante.nome}
+                      </h3>
+                    </Link>
                     <ul className="space-y-2">
                       {pedido.itens.map((item) => (
                         <li
@@ -212,9 +224,8 @@ export function MeusPedidos() {
                       </p>
                     </div>
 
-                    {/* Alteramos o botão no map dos pedidos: */}
                     <button
-                      onClick={() => setPedidoSelecionado(pedido)} // Abre o Modal
+                      onClick={() => setPedidoSelecionado(pedido)}
                       className="mt-4 text-xs font-black uppercase text-river-green hover:text-river-dark transition-colors tracking-widest"
                     >
                       Ver Detalhes do Pedido
@@ -226,6 +237,7 @@ export function MeusPedidos() {
           })}
         </div>
       )}
+      
       {/* Componente do Modal no fim da página */}
       <OrderDetailModal
         isOpen={!!pedidoSelecionado}
