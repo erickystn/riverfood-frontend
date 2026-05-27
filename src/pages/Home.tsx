@@ -107,7 +107,7 @@ export function Home() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-10 md:p-14"
+            className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-6 md:p-14"
           >
             {/* Imagem de Fundo Dinâmica */}
             <div
@@ -115,27 +115,32 @@ export function Home() {
               style={{ backgroundImage: `url(${heroSlides[currentSlide].bgImage})` }}
             />
 
-            {/* Conteúdo Dinâmico */}
-            <div className="relative z-10 max-w-2xl mx-auto space-y-6 w-full flex flex-col items-center">
-              <div className="inline-flex items-center gap-2 bg-river-light/20 text-river-green px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest backdrop-blur-sm border border-river-green/20">
+            {/* Conteúdo */}
+            <div className="relative z-10 max-w-2xl mx-auto space-y-4 w-full flex flex-col items-center">
+
+              {/* Badge Menor no mobile */}
+              <div className="inline-flex items-center gap-2 bg-river-light/20 text-river-green px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-sm border border-river-green/20">
                 {heroSlides[currentSlide].icon}
                 {heroSlides[currentSlide].badge}
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-md">
+              {/* Título com ajuste de tamanho para mobile */}
+              <h1 className="text-3xl md:text-5xl font-black text-white leading-[1.1] tracking-tight drop-shadow-md px-2">
                 {heroSlides[currentSlide].title}
               </h1>
 
-              <p className="text-slate-300 font-medium text-lg max-w-xl">
+              {/* Descrição mais curta no mobile */}
+              <p className="text-slate-300 font-medium text-sm md:text-lg max-w-xl px-4 line-clamp-3">
                 {heroSlides[currentSlide].description}
               </p>
 
-              <div className="pt-6">
+              {/* Botão com tamanho ajustado */}
+              <div className="pt-2">
                 <button
                   onClick={() => handleCtaClick(heroSlides[currentSlide].query)}
-                  className="bg-river-green text-river-dark font-black px-8 py-4 rounded-full hover:bg-emerald-400 transition-all flex items-center gap-2 shadow-lg hover:shadow-river-green/30 hover:-translate-y-1"
+                  className="bg-river-green text-river-dark font-black px-6 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-base hover:bg-emerald-400 transition-all flex items-center gap-2 shadow-lg"
                 >
-                  {heroSlides[currentSlide].ctaText} <ArrowRight size={18} weight="bold" />
+                  {heroSlides[currentSlide].ctaText} <ArrowRight size={16} weight="bold" />
                 </button>
               </div>
             </div>
