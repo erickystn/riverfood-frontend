@@ -87,6 +87,8 @@ VITE_API_URL=http://localhost:3000
 ![Dashboard Gerencial](./doc/img/admin.png)
 ### Histórico de Pedidos
 ![Histórico de Pedidos](./doc/img/historico.png)
+### Visão do Motoboy (Mobile-Only)
+![Histórico de Pedidos](./doc/img/motoboyview.png)
 
 ---
 ## 👨‍💻 Desenvolvedor
