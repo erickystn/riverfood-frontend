@@ -29,6 +29,14 @@ A interface web da plataforma **RiverFood** é uma solução full-stack que rede
 
 ## 🚀 Tecnologias Utilizadas
 
+* **Framework & Build Tool:** React (Vite) + TypeScript
+* **Estilização & Animação:** Tailwind CSS, Framer Motion, Phosphor Icons
+* **Gerenciamento de Estado:** Zustand (com Persistence)
+* **Validação e Integração:** Zod, Axios
+* **Arquitetura & Deploy:** SPA (Single Page Application) estruturada, deploy via Vercel.
+
+### Detalhamento da Stack
+
 | Tecnologia | Categoria | Papel na Plataforma |
 | :--- | :--- | :--- |
 | **[React](https://react.dev/)** | Core Library | Construção da interface declarativa em componentes funcionais modernos com hooks. |
@@ -57,6 +65,19 @@ A interface web da plataforma **RiverFood** é uma solução full-stack que rede
 ---
 
 ## 🛠️ Arquitetura do Projeto
+
+Estrutura principal orientada a domínios e componentização inteligente:
+```
+src/
+├── components/    -> Modais, Cards, Sidebars e Layouts assíncronos
+├── pages/         -> Telas principais do roteamento
+│   ├── admin/     -> Painel de gestão do Restaurante
+│   └── ...        -> Fluxo do Cliente (Home, Checkout)
+├── schemas/       -> Validação de dados de entrada do Front-end (Zod)
+├── services/      -> Centralização das requisições para a API REST
+├── store/         -> Gerenciamento de estado global (Zustand)
+└── utils/         -> Funções auxiliares e utilitários de estilo (Tailwind Merge)
+```
 
 ### Estrutura Completa de Diretórios
 
@@ -172,39 +193,21 @@ flowchart TD
 ## 💻 Como Executar o Projeto Localmente
 
 ### Pré-requisitos
-* [Node.js](https://nodejs.org/) versão 18 LTS ou superior instalada.
-* Gerenciador de pacotes `npm` ou `yarn`.
-* A API do **RiverFood Backend** em execução (localmente ou via URL em nuvem).
+* Node.js instalado (versão 18 ou superior).
+* A API do RiverFood (Back-end) deve estar rodando localmente ou em nuvem.
 
 ### Configuração de Ambiente
-Crie um arquivo `.env` na raiz do projeto com base no modelo abaixo:
-
+Crie um arquivo `.env` na raiz do projeto contendo as seguintes chaves:
 ```env
 VITE_API_URL=http://localhost:3000
 ```
 
 ### Comandos Disponíveis
 
-1. **Instalação das dependências:**
-   ```bash
-   npm install
-   ```
-
-2. **Inicialização em modo de desenvolvimento:**
-   ```bash
-   npm run dev
-   ```
-   Acesse a aplicação em seu navegador no endereço: `http://localhost:5173`
-
-3. **Geração de build para produção:**
-   ```bash
-   npm run build
-   ```
-
-4. **Verificação de linting de código:**
-   ```bash
-   npm run lint
-   ```
+1. **Instalação:** `npm install` (Instala todas as dependências)
+2. **Desenvolvimento:** `npm run dev` (Inicia o servidor Vite na porta 5173)
+3. **Build:** `npm run build` (Gera a versão otimizada para produção)
+4. **Lint:** `npm run lint` (Executa o ESLint para validação de código)
 
 ---
 
@@ -213,27 +216,64 @@ VITE_API_URL=http://localhost:3000
 ### Visão do Cliente & Motor de HealthScore
 > Exploração do cardápio e análise nutricional dinâmica dos pratos.
 
-### Página Inicial
-<details>
-  <summary><strong>🖥️ Ver a Página Inicial Completa (Clique AQUI para expandir)</strong></summary>
+<details open>
+  <summary><strong>🖥️ Ver a Página Inicial Completa</strong></summary>
 
-   ![Página Inicial](./doc/img/inicial.png)
+  <br />
+
+  ![Página Inicial](./doc/img/inicial.png)
 
 </details>
 
-### Detalhe do Produto
-![Detalhes do Produto](./doc/img/card.png)
+<br />
+
+<details>
+  <summary><strong>🥗 Ver Detalhes do Produto (Raio-X Nutricional)</strong></summary>
+
+  <br />
+
+  ![Detalhes do Produto](./doc/img/card.png)
+
+</details>
 
 ---
 
 ### Visão do Restaurante (Painel Administrativo)
 > Dashboard gerencial de vendas, saúde do cardápio e gestão de frota/pedidos.
 
-### Dashboard Gerencial
-![Dashboard Gerencial](./doc/img/admin.png)
+<details open>
+  <summary><strong>📊 Ver Dashboard Gerencial</strong></summary>
 
-### Histórico de Pedidos
-![Histórico de Pedidos](./doc/img/historico.png)
+  <br />
+
+  ![Dashboard Gerencial](./doc/img/admin.png)
+
+</details>
+
+<br />
+
+<details>
+  <summary><strong>📋 Ver Histórico de Pedidos</strong></summary>
+
+  <br />
+
+  ![Histórico de Pedidos](./doc/img/historico.png)
+
+</details>
+
+---
+
+### Visão do Motoboy (Mobile-Only)
+> Painel dedicado para o entregador acompanhar rotas e entregas ativas.
+
+<details open>
+  <summary><strong>🛵 Ver Painel de Entregas do Motoboy</strong></summary>
+
+  <br />
+
+  ![Visão do Motoboy](./doc/img/motoboyview.png)
+
+</details>
 
 ---
 
